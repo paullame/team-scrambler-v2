@@ -28,8 +28,7 @@ function resolveDisplayName(
   headers: string[],
   fallback: string,
 ): string {
-  const lower = (key: string) =>
-    headers.find((h) => h.toLowerCase() === key.toLowerCase()) ?? "";
+  const lower = (key: string) => headers.find((h) => h.toLowerCase() === key.toLowerCase()) ?? "";
 
   const col = (key: string) => row[lower(key)]?.trim() ?? "";
 

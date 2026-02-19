@@ -1,10 +1,10 @@
 import {
   require_react_dom
-} from "./chunk-3B2VHHOY.js";
+} from "./chunk-X3NYG4DJ.js";
 import {
   __commonJS,
   require_react
-} from "./chunk-G63B7M7D.js";
+} from "./chunk-REKLY4FN.js";
 
 // node_modules/.deno/scheduler@0.27.0/node_modules/scheduler/cjs/scheduler.development.js
 var require_scheduler_development = __commonJS({

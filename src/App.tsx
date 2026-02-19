@@ -43,8 +43,7 @@ function App() {
           <span>{people.length} people</span>
           <span>&mdash;</span>
           <span>
-            {criteria.length} criteria:{" "}
-            {criteria.map((c) => c.label).join(", ")}
+            {criteria.length} criteria: {criteria.map((c) => c.label).join(", ")}
           </span>
         </div>
 

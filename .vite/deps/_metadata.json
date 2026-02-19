@@ -2,45 +2,51 @@
   "hash": "6c0308d0",
   "configHash": "549b468a",
   "lockfileHash": "e3b0c442",
-  "browserHash": "fd2a0751",
+  "browserHash": "9995446d",
   "optimized": {
     "react/jsx-runtime": {
       "src": "../../node_modules/.deno/react@19.2.4/node_modules/react/jsx-runtime.js",
       "file": "react_jsx-runtime.js",
-      "fileHash": "89dabd24",
+      "fileHash": "a89f3671",
       "needsInterop": true
     },
     "react": {
       "src": "../../node_modules/.deno/react@19.2.4/node_modules/react/index.js",
       "file": "react.js",
-      "fileHash": "5e26cee6",
+      "fileHash": "9db2abe6",
       "needsInterop": true
     },
     "react-dom": {
       "src": "../../node_modules/.deno/react-dom@19.2.4/node_modules/react-dom/index.js",
       "file": "react-dom.js",
-      "fileHash": "e5788498",
+      "fileHash": "e904638e",
       "needsInterop": true
     },
     "react/jsx-dev-runtime": {
       "src": "../../node_modules/.deno/react@19.2.4/node_modules/react/jsx-dev-runtime.js",
       "file": "react_jsx-dev-runtime.js",
-      "fileHash": "d2c91456",
+      "fileHash": "3498aa52",
       "needsInterop": true
     },
     "react-dom/client": {
       "src": "../../node_modules/.deno/react-dom@19.2.4/node_modules/react-dom/client.js",
       "file": "react-dom_client.js",
-      "fileHash": "430aea26",
+      "fileHash": "0421ee27",
       "needsInterop": true
+    },
+    "lucide-react": {
+      "src": "../../node_modules/.deno/lucide-react@0.575.0/node_modules/lucide-react/dist/esm/lucide-react.js",
+      "file": "lucide-react.js",
+      "fileHash": "491f0fde",
+      "needsInterop": false
     }
   },
   "chunks": {
-    "chunk-3B2VHHOY": {
-      "file": "chunk-3B2VHHOY.js"
+    "chunk-X3NYG4DJ": {
+      "file": "chunk-X3NYG4DJ.js"
     },
-    "chunk-G63B7M7D": {
-      "file": "chunk-G63B7M7D.js"
+    "chunk-REKLY4FN": {
+      "file": "chunk-REKLY4FN.js"
     }
   }
 }

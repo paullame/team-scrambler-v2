@@ -1,7 +1,7 @@
 import {
   __commonJS,
   require_react
-} from "./chunk-G63B7M7D.js";
+} from "./chunk-REKLY4FN.js";
 
 // node_modules/.deno/react@19.2.4/node_modules/react/cjs/react-jsx-runtime.development.js
 var require_react_jsx_runtime_development = __commonJS({

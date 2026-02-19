@@ -10,6 +10,7 @@
     "@std/csv": "jsr:@std/csv@^1",
     "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.2.0",
     "daisyui": "npm:daisyui@^5.5.18",
+    "lucide-react": "npm:lucide-react@^0.575.0",
     "react": "npm:react@^19.2.4",
     "react-dom": "npm:react-dom@^19.2.4",
     "react-router-dom": "npm:react-router-dom@^7.13.0",
@@ -27,5 +28,11 @@
     ],
     "jsx": "react-jsx",
     "jsxImportSource": "react"
+  },
+  "fmt": {
+    "lineWidth": 160,
+    "exclude": [
+      ".github/skills/"
+    ]
   }
 }

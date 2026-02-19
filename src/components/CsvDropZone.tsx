@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { UploadCloud } from "lucide-react";
 
 interface Props {
   /** Called with the raw CSV text once a file is successfully read. */
@@ -51,11 +52,7 @@ export function CsvDropZone({ onLoad, error, fileName }: Props) {
 
   return (
     <div
-      className={`${zoneBase} ${
-        dragging
-          ? zoneOver
-          : "hover:border-base-content/40 focus-visible:border-base-content/40"
-      }`}
+      className={`${zoneBase} ${dragging ? zoneOver : "hover:border-base-content/40 focus-visible:border-base-content/40"}`}
       onClick={() => inputRef.current?.click()}
       onKeyDown={(e) => e.key === "Enter" && inputRef.current?.click()}
       onDragOver={(e) => {
@@ -79,12 +76,11 @@ export function CsvDropZone({ onLoad, error, fileName }: Props) {
       />
 
       <div className="flex items-center gap-3 text-sm opacity-70">
-        <span className="text-2xl leading-none" aria-hidden="true">📂</span>
+        <UploadCloud className="size-6 shrink-0" aria-hidden="true" />
         {fileName
           ? (
             <span>
-              <strong className="opacity-100">{fileName}</strong>&nbsp;loaded —
-              drop or click to replace
+              <strong className="opacity-100">{fileName}</strong>&nbsp;loaded — drop or click to replace
             </span>
           )
           : (

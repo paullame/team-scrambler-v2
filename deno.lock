@@ -11,6 +11,7 @@
     "npm:@types/react@^19.2.14": "19.2.14",
     "npm:@vitejs/plugin-react@^5.1.4": "5.1.4_vite@7.3.1__picomatch@4.0.3_@babel+core@7.29.0",
     "npm:daisyui@^5.5.18": "5.5.18",
+    "npm:lucide-react@0.575": "0.575.0_react@19.2.4",
     "npm:react-dom@^19.2.4": "19.2.4_react@19.2.4",
     "npm:react-router-dom@^7.13.0": "7.13.0_react@19.2.4_react-dom@19.2.4__react@19.2.4",
     "npm:react@^19.2.4": "19.2.4",
@@ -820,6 +821,12 @@
         "yallist"
       ]
     },
+    "lucide-react@0.575.0_react@19.2.4": {
+      "integrity": "sha512-VuXgKZrk0uiDlWjGGXmKV6MSk9Yy4l10qgVvzGn2AWBx1Ylt0iBexKOAoA6I7JO3m+M9oeovJd3yYENfkUbOeg==",
+      "dependencies": [
+        "react"
+      ]
+    },
     "magic-string@0.30.21": {
       "integrity": "sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==",
       "dependencies": [
@@ -981,6 +988,7 @@
       "npm:@types/react@^19.2.14",
       "npm:@vitejs/plugin-react@^5.1.4",
       "npm:daisyui@^5.5.18",
+      "npm:lucide-react@0.575",
       "npm:react-dom@^19.2.4",
       "npm:react-router-dom@^7.13.0",
       "npm:react@^19.2.4",

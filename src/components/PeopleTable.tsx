@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import type { CriteriaField, Person } from "../types.ts";
 
 interface Props {
@@ -38,21 +39,15 @@ export function PeopleTable({ people, criteria, onChange }: Props) {
   }
 
   const sorted = [...people].sort((a, b) => {
-    const av = sortKey === "displayName"
-      ? a.displayName
-      : (a.criteria[sortKey] ?? "");
-    const bv = sortKey === "displayName"
-      ? b.displayName
-      : (b.criteria[sortKey] ?? "");
+    const av = sortKey === "displayName" ? a.displayName : (a.criteria[sortKey] ?? "");
+    const bv = sortKey === "displayName" ? b.displayName : (b.criteria[sortKey] ?? "");
     const cmp = av.localeCompare(bv, undefined, { sensitivity: "base" });
     return sortDir === "asc" ? cmp : -cmp;
   });
 
   function sortIcon(key: string) {
     if (sortKey !== key) return <span className="opacity-20 ml-1">↕</span>;
-    return (
-      <span className="ml-1">{sortDir === "asc" ? "↑" : "↓"}</span>
-    );
+    return <span className="ml-1">{sortDir === "asc" ? "↑" : "↓"}</span>;
   }
 
   // ── Edit ─────────────────────────────────────────────────────────────────
@@ -74,13 +69,7 @@ export function PeopleTable({ people, criteria, onChange }: Props) {
   }
 
   function setDraftField(key: string, value: string) {
-    setEditDraft((d) =>
-      d
-        ? key === "displayName"
-          ? { ...d, displayName: value }
-          : { ...d, criteria: { ...d.criteria, [key]: value } }
-        : d
-    );
+    setEditDraft((d) => d ? key === "displayName" ? { ...d, displayName: value } : { ...d, criteria: { ...d.criteria, [key]: value } } : d);
   }
 
   // ── Delete ────────────────────────────────────────────────────────────────
@@ -102,17 +91,14 @@ export function PeopleTable({ people, criteria, onChange }: Props) {
   }
 
   function commitAdd() {
-    if (!newDraft.displayName.trim()) return; // name is required
+    if (!newDraft.displayName.trim()) return; // name is required,
+
     onChange([...people, { ...newDraft, displayName: newDraft.displayName.trim() }]);
     setAddingRow(false);
   }
 
   function setNewField(key: string, value: string) {
-    setNewDraft((d) =>
-      key === "displayName"
-        ? { ...d, displayName: value }
-        : { ...d, criteria: { ...d.criteria, [key]: value } }
-    );
+    setNewDraft((d) => key === "displayName" ? { ...d, displayName: value } : { ...d, criteria: { ...d.criteria, [key]: value } });
   }
 
   // ── Column definitions ────────────────────────────────────────────────────
@@ -172,7 +158,8 @@ export function PeopleTable({ people, criteria, onChange }: Props) {
                   className="cursor-pointer select-none whitespace-nowrap"
                   onClick={() => handleSort(key)}
                 >
-                  {label}{sortIcon(key)}
+                  {label}
+                  {sortIcon(key)}
                 </th>
               ))}
               {/* actions column */}
@@ -192,9 +179,7 @@ export function PeopleTable({ people, criteria, onChange }: Props) {
                           <td key={key}>
                             {renderInput(
                               key,
-                              key === "displayName"
-                                ? editDraft.displayName
-                                : (editDraft.criteria[key] ?? ""),
+                              key === "displayName" ? editDraft.displayName : (editDraft.criteria[key] ?? ""),
                               (v) => setDraftField(key, v),
                               i === 0,
                             )}
@@ -232,14 +217,14 @@ export function PeopleTable({ people, criteria, onChange }: Props) {
                               onClick={() => startEdit(person)}
                               aria-label="Edit row"
                             >
-                              ✏️
+                              <Pencil className="size-3.5" />
                             </button>
                             <button
                               className="btn btn-xs btn-ghost text-error"
                               onClick={() => deletePerson(person.id)}
                               aria-label="Delete row"
                             >
-                              🗑️
+                              <Trash2 className="size-3.5" />
                             </button>
                           </div>
                         </td>
@@ -256,9 +241,7 @@ export function PeopleTable({ people, criteria, onChange }: Props) {
                   <td key={key}>
                     {renderInput(
                       key,
-                      key === "displayName"
-                        ? newDraft.displayName
-                        : (newDraft.criteria[key] ?? ""),
+                      key === "displayName" ? newDraft.displayName : (newDraft.criteria[key] ?? ""),
                       (v) => setNewField(key, v),
                       i === 0,
                     )}
@@ -290,7 +273,7 @@ export function PeopleTable({ people, criteria, onChange }: Props) {
       {!addingRow && (
         <div>
           <button className="btn btn-sm btn-outline" onClick={startAdd}>
-            + Add person
+            <Plus className="size-4" /> Add person
           </button>
         </div>
       )}

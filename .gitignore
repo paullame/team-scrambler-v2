@@ -22,4 +22,4 @@ dist-ssr
 *.sw?
 data/*
 !data/example.csv
-client/.vite
+.vite/*
