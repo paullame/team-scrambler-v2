@@ -1,6 +1,6 @@
 # Plan (to be updated along the way)
 
-## Phase 1 — Data Model & CSV Parsing
+## Phase 1 — Data Model & CSV Parsing [COMPLETE]
 
 **Goal**: establish the shared data contracts and parsing logic everything
 depends on.
@@ -10,7 +10,7 @@ headers, infers column names as criteria keys, supports
 firstName/lastName/displayName name variants Load example data (example.csv) by
 default on startup
 
-## Phase 2 — CSV Import UI
+## Phase 2 — CSV Import UI [COMPLETE]
 
 **Goal**: let users get their own data in.
 
