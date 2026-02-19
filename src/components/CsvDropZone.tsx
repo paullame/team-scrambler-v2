@@ -51,7 +51,11 @@ export function CsvDropZone({ onLoad, error, fileName }: Props) {
 
   return (
     <div
-      className={`${zoneBase} ${dragging ? zoneOver : "hover:border-base-content/40 focus-visible:border-base-content/40"}`}
+      className={`${zoneBase} ${
+        dragging
+          ? zoneOver
+          : "hover:border-base-content/40 focus-visible:border-base-content/40"
+      }`}
       onClick={() => inputRef.current?.click()}
       onKeyDown={(e) => e.key === "Enter" && inputRef.current?.click()}
       onDragOver={(e) => {
@@ -79,7 +83,8 @@ export function CsvDropZone({ onLoad, error, fileName }: Props) {
         {fileName
           ? (
             <span>
-              <strong className="opacity-100">{fileName}</strong>&nbsp;loaded — drop or click to replace
+              <strong className="opacity-100">{fileName}</strong>&nbsp;loaded —
+              drop or click to replace
             </span>
           )
           : (

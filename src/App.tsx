@@ -56,9 +56,8 @@ function App() {
               {people.map((p) => (
                 <tr key={p.id}>
                   <td className="font-medium">{p.displayName}</td>
-                  {criteria.map((c) => (
-                    <td key={c.key}>{p.criteria[c.key]}</td>
-                  ))}
+                  {criteria.map((c) => <td key={c.key}>{p.criteria[c.key]}
+                  </td>)}
                 </tr>
               ))}
             </tbody>
