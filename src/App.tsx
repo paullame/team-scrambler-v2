@@ -1,12 +1,22 @@
 import { useState } from "react";
 import exampleCsv from "../data/example.csv?raw";
 import { parseCSV } from "./core/csvParser.ts";
-import type { CriteriaField, Person } from "./types.ts";
+import type { CriteriaField, Person, ScramblerConfig } from "./types.ts";
 import { CsvDropZone } from "./components/CsvDropZone.tsx";
 import { PeopleTable } from "./components/PeopleTable.tsx";
+import { ScramblerSettings } from "./components/ScramblerSettings.tsx";
 
 const DEFAULT_PARSED = parseCSV(exampleCsv);
 const DEFAULT_FILE_NAME = "example.csv";
+
+function defaultConfig(criteria: CriteriaField[]): ScramblerConfig {
+  return {
+    mode: "teamCount",
+    teamCount: 4,
+    teamSize: 5,
+    balanceCriteria: criteria.map((c) => c.key),
+  };
+}
 
 function App() {
   const [fileName, setFileName] = useState<string>(DEFAULT_FILE_NAME);
@@ -15,12 +25,16 @@ function App() {
   const [criteria, setCriteria] = useState<CriteriaField[]>(
     DEFAULT_PARSED.criteria,
   );
+  const [config, setConfig] = useState<ScramblerConfig>(
+    defaultConfig(DEFAULT_PARSED.criteria),
+  );
 
   function handleLoad(text: string, name: string) {
     try {
       const { people: p, criteria: c } = parseCSV(text);
       setPeople(p);
       setCriteria(c);
+      setConfig(defaultConfig(c));
       setFileName(name);
       setParseError(undefined);
     } catch (e) {
@@ -46,6 +60,13 @@ function App() {
             {criteria.length} criteria: {criteria.map((c) => c.label).join(", ")}
           </span>
         </div>
+
+        <ScramblerSettings
+          config={config}
+          criteria={criteria}
+          peopleCount={people.length}
+          onChange={setConfig}
+        />
 
         <PeopleTable
           people={people}

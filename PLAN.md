@@ -14,7 +14,7 @@ firstName/lastName/displayName name variants Load example data (example.csv) by 
 Drag-and-drop / click-to-upload zone (src/components/CsvDropZone.tsx) Parse the uploaded CSV and update app state Basic error handling (bad format, missing name
 column)
 
-## Phase 3 — Individuals Table
+## Phase 3 — Individuals Table [COMPLETE]
 
 **Goal**: show and edit the imported data before scrambling.
 

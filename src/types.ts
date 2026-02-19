@@ -30,3 +30,22 @@ export interface ParsedCSV {
   people: Person[];
   criteria: CriteriaField[];
 }
+
+/**
+ * Controls how the scrambler distributes people into teams.
+ */
+export type DistributionMode = "teamCount" | "teamSize";
+
+/**
+ * Configuration for the scrambler.
+ */
+export interface ScramblerConfig {
+  /** Whether to specify a fixed number of teams or a fixed team size. */
+  mode: DistributionMode;
+  /** Number of teams to create (used when mode === "teamCount"). */
+  teamCount: number;
+  /** Target number of people per team (used when mode === "teamSize"). */
+  teamSize: number;
+  /** Criterion keys that should be balanced across teams. */
+  balanceCriteria: string[];
+}
