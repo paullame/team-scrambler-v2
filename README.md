@@ -9,7 +9,7 @@ for the resulting teams.
 ## Overview
 
 - React with TypeScript on the frontend
-- tailwindcss for styling
+- tailwindcss daisyui for styling
 - Vite for the development server
 - deno for typescript runtime
 

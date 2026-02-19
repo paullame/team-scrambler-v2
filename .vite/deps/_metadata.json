@@ -1,37 +1,37 @@
 {
-  "hash": "5a264f32",
-  "configHash": "57b27ee0",
+  "hash": "6c0308d0",
+  "configHash": "549b468a",
   "lockfileHash": "e3b0c442",
-  "browserHash": "0ae42f1d",
+  "browserHash": "fd2a0751",
   "optimized": {
     "react/jsx-runtime": {
       "src": "../../node_modules/.deno/react@19.2.4/node_modules/react/jsx-runtime.js",
       "file": "react_jsx-runtime.js",
-      "fileHash": "339bd922",
+      "fileHash": "89dabd24",
       "needsInterop": true
     },
     "react": {
       "src": "../../node_modules/.deno/react@19.2.4/node_modules/react/index.js",
       "file": "react.js",
-      "fileHash": "9e853f3b",
+      "fileHash": "5e26cee6",
       "needsInterop": true
     },
     "react-dom": {
       "src": "../../node_modules/.deno/react-dom@19.2.4/node_modules/react-dom/index.js",
       "file": "react-dom.js",
-      "fileHash": "a81af089",
+      "fileHash": "e5788498",
       "needsInterop": true
     },
     "react/jsx-dev-runtime": {
       "src": "../../node_modules/.deno/react@19.2.4/node_modules/react/jsx-dev-runtime.js",
       "file": "react_jsx-dev-runtime.js",
-      "fileHash": "6465df28",
+      "fileHash": "d2c91456",
       "needsInterop": true
     },
     "react-dom/client": {
       "src": "../../node_modules/.deno/react-dom@19.2.4/node_modules/react-dom/client.js",
       "file": "react-dom_client.js",
-      "fileHash": "fe04c58b",
+      "fileHash": "430aea26",
       "needsInterop": true
     }
   },
