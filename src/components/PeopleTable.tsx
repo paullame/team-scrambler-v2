@@ -188,12 +188,14 @@ export function PeopleTable({ people, criteria, onChange }: Props) {
                         <td className="text-right whitespace-nowrap">
                           <div className="flex gap-1 justify-end">
                             <button
+                              type="button"
                               className="btn btn-xs btn-success"
                               onClick={commitEdit}
                             >
                               Save
                             </button>
                             <button
+                              type="button"
                               className="btn btn-xs btn-ghost"
                               onClick={cancelEdit}
                             >
@@ -213,6 +215,7 @@ export function PeopleTable({ people, criteria, onChange }: Props) {
                         <td className="text-right whitespace-nowrap">
                           <div className="flex gap-1 justify-end">
                             <button
+                              type="button"
                               className="btn btn-xs btn-ghost"
                               onClick={() => startEdit(person)}
                               aria-label="Edit row"
@@ -220,6 +223,7 @@ export function PeopleTable({ people, criteria, onChange }: Props) {
                               <Pencil className="size-3.5" />
                             </button>
                             <button
+                              type="button"
                               className="btn btn-xs btn-ghost text-error"
                               onClick={() => deletePerson(person.id)}
                               aria-label="Delete row"
@@ -250,6 +254,7 @@ export function PeopleTable({ people, criteria, onChange }: Props) {
                 <td className="text-right whitespace-nowrap">
                   <div className="flex gap-1 justify-end">
                     <button
+                      type="button"
                       className="btn btn-xs btn-success"
                       onClick={commitAdd}
                       disabled={!newDraft.displayName.trim()}
@@ -257,6 +262,7 @@ export function PeopleTable({ people, criteria, onChange }: Props) {
                       Add
                     </button>
                     <button
+                      type="button"
                       className="btn btn-xs btn-ghost"
                       onClick={cancelAdd}
                     >
@@ -272,7 +278,7 @@ export function PeopleTable({ people, criteria, onChange }: Props) {
 
       {!addingRow && (
         <div>
-          <button className="btn btn-sm btn-outline" onClick={startAdd}>
+          <button type="button" className="btn btn-sm btn-outline" onClick={startAdd}>
             <Plus className="size-4" /> Add person
           </button>
         </div>
