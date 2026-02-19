@@ -6,6 +6,7 @@
     "preview": "deno run -A npm:vite preview"
   },
   "imports": {
+    "@std/csv": "jsr:@std/csv@^1",
     "react": "npm:react@^19.2.4",
     "react-dom": "npm:react-dom@^19.2.4",
     "react-router-dom": "npm:react-router-dom@^7.13.0",

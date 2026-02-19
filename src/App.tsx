@@ -1,31 +1,45 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import "./App.css";
+import exampleCsv from "../data/example.csv?raw";
+import { parseCSV } from "./core/csvParser.ts";
+import type { ParsedCSV } from "./types.ts";
+
+const DEFAULT_DATA: ParsedCSV = parseCSV(exampleCsv);
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [csvText, setCsvText] = useState<string>(exampleCsv);
+
+  const { people, criteria } = useMemo(() => {
+    try {
+      return parseCSV(csvText);
+    } catch {
+      return DEFAULT_DATA;
+    }
+  }, [csvText]);
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src="/react.svg" className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button type="button" onClick={() => setCount((count: number) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
+      <h1>Team Scrambler</h1>
+      <p>
+        {people.length} people loaded &mdash; {criteria.length} criteria:{" "}
+        {criteria.map((c) => c.label).join(", ")}
       </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            {criteria.map((c) => <th key={c.key}>{c.label}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {people.map((p) => (
+            <tr key={p.id}>
+              <td>{p.displayName}</td>
+              {criteria.map((c) => <td key={c.key}>{p.criteria[c.key]}</td>)}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </>
   );
 }

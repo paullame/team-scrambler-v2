@@ -1,6 +1,9 @@
 {
   "version": "5",
   "specifiers": {
+    "jsr:@std/bytes@^1.0.5": "1.0.6",
+    "jsr:@std/csv@1": "1.0.6",
+    "jsr:@std/streams@^1.0.9": "1.0.9",
     "npm:@deno/vite-plugin@^1.0.6": "1.0.6_vite@7.3.1__picomatch@4.0.3",
     "npm:@types/react@^19.2.14": "19.2.14",
     "npm:@vitejs/plugin-react@^5.1.4": "5.1.4_vite@7.3.1__picomatch@4.0.3_@babel+core@7.29.0",
@@ -9,6 +12,23 @@
     "npm:react@^19.2.4": "19.2.4",
     "npm:vite@*": "7.3.1_picomatch@4.0.3",
     "npm:vite@^7.3.1": "7.3.1_picomatch@4.0.3"
+  },
+  "jsr": {
+    "@std/bytes@1.0.6": {
+      "integrity": "f6ac6adbd8ccd99314045f5703e23af0a68d7f7e58364b47d2c7f408aeb5820a"
+    },
+    "@std/csv@1.0.6": {
+      "integrity": "52ef0e62799a0028d278fa04762f17f9bd263fad9a8e7f98c14fbd371d62d9fd",
+      "dependencies": [
+        "jsr:@std/streams"
+      ]
+    },
+    "@std/streams@1.0.9": {
+      "integrity": "a9d26b1988cdd7aa7b1f4b51e1c36c1557f3f252880fa6cc5b9f37078b1a5035",
+      "dependencies": [
+        "jsr:@std/bytes"
+      ]
+    }
   },
   "npm": {
     "@babel/code-frame@7.29.0": {
@@ -737,6 +757,7 @@
   },
   "workspace": {
     "dependencies": [
+      "jsr:@std/csv@1",
       "npm:@deno/vite-plugin@^1.0.6",
       "npm:@types/react@^19.2.14",
       "npm:@vitejs/plugin-react@^5.1.4",
