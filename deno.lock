@@ -5,6 +5,7 @@
     "jsr:@std/bytes@^1.0.5": "1.0.6",
     "jsr:@std/csv@1": "1.0.6",
     "jsr:@std/internal@^1.0.12": "1.0.12",
+    "jsr:@std/random@0.1": "0.1.0",
     "jsr:@std/streams@^1.0.9": "1.0.9",
     "npm:@deno/vite-plugin@^1.0.6": "1.0.6_vite@7.3.1__picomatch@4.0.3",
     "npm:@tailwindcss/vite@^4.2.0": "4.2.0_vite@7.3.1__picomatch@4.0.3",
@@ -37,6 +38,9 @@
     },
     "@std/internal@1.0.12": {
       "integrity": "972a634fd5bc34b242024402972cd5143eac68d8dffaca5eaa4dba30ce17b027"
+    },
+    "@std/random@0.1.0": {
+      "integrity": "70a006be0ffb77d036bab54aa8ae6bd0119ba77ace0f2f56f63273d4262a5667"
     },
     "@std/streams@1.0.9": {
       "integrity": "a9d26b1988cdd7aa7b1f4b51e1c36c1557f3f252880fa6cc5b9f37078b1a5035",
@@ -983,6 +987,7 @@
     "dependencies": [
       "jsr:@std/assert@1",
       "jsr:@std/csv@1",
+      "jsr:@std/random@0.1",
       "npm:@deno/vite-plugin@^1.0.6",
       "npm:@tailwindcss/vite@^4.2.0",
       "npm:@types/react@^19.2.14",

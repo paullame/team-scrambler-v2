@@ -49,3 +49,26 @@ export interface ScramblerConfig {
   /** Criterion keys that should be balanced across teams. */
   balanceCriteria: string[];
 }
+
+/**
+ * Per-criterion value distribution within a single team.
+ */
+export interface CriterionDistribution {
+  key: string;
+  label: string;
+  /** value → count of members with that value */
+  counts: Record<string, number>;
+  /** value → proportion of team members with that value (0–1) */
+  ratios: Record<string, number>;
+}
+
+/**
+ * A single team produced by the scrambler.
+ */
+export interface Team {
+  id: string;
+  name: string;
+  members: Person[];
+  /** Diversity metrics, one entry per balanced criterion. */
+  metrics: CriterionDistribution[];
+}

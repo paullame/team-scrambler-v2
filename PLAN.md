@@ -20,7 +20,7 @@ column)
 
 Sortable table rendering each Person row (src/components/PeopleTable.tsx) Inline add / edit / delete rows Column headers derived from the CSV criteria keys
 
-## Phase 4 — Scrambler Settings
+## Phase 4 — Scrambler Settings [COMPLETE]
 
 **Goal**: configure how teams are built.
 
