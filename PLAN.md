@@ -62,7 +62,7 @@ main panel: people table (`max-w-3xl`) + team cards grid. Team cards show member
 - **Export to PNG**: use `html-to-image` or `dom-to-image-more` to snapshot the team cards grid; offer a download link
 - Disable export buttons until teams have been generated
 
-## Phase 9 — Theming & Visual Polish
+## Phase 9 — Theming & Visual Polish [COMPLETE]
 
 **Goal**: make the tool feel distinctive and enjoyable.
 
