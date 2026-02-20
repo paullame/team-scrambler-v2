@@ -44,7 +44,7 @@ main panel: people table (`max-w-3xl`) + team cards grid. Team cards show member
 
 ---
 
-## Phase 7 — Team Card Interactions
+## Phase 7 — Team Card Interactions [COMPLETE]
 
 **Goal**: let users fine-tune results after scrambling.
 

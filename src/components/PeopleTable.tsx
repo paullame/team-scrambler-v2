@@ -1,6 +1,7 @@
-import { useState } from "react";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import type { CriteriaField, Person } from "../types.ts";
+import { useTableSort } from "../hooks/useTableSort.ts";
+import { useTableEdit } from "../hooks/useTableEdit.ts";
 
 interface Props {
   people: Person[];
@@ -8,97 +9,27 @@ interface Props {
   onChange: (people: Person[]) => void;
 }
 
-type SortDir = "asc" | "desc";
-
-// Blank person shell used when adding a new row.
-function blankPerson(criteria: CriteriaField[]): Person {
-  return {
-    id: crypto.randomUUID(),
-    displayName: "",
-    criteria: Object.fromEntries(criteria.map((c) => [c.key, ""])),
-  };
-}
-
 export function PeopleTable({ people, criteria, onChange }: Props) {
-  const [editId, setEditId] = useState<string | null>(null);
-  const [editDraft, setEditDraft] = useState<Person | null>(null);
-  const [sortKey, setSortKey] = useState<string>("displayName");
-  const [sortDir, setSortDir] = useState<SortDir>("asc");
-  const [addingRow, setAddingRow] = useState(false);
-  const [newDraft, setNewDraft] = useState<Person>(() => blankPerson(criteria));
-
-  // ── Sorting ──────────────────────────────────────────────────────────────
-
-  function handleSort(key: string) {
-    if (sortKey === key) {
-      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    } else {
-      setSortKey(key);
-      setSortDir("asc");
-    }
-  }
-
-  const sorted = [...people].sort((a, b) => {
-    const av = sortKey === "displayName" ? a.displayName : (a.criteria[sortKey] ?? "");
-    const bv = sortKey === "displayName" ? b.displayName : (b.criteria[sortKey] ?? "");
-    const cmp = av.localeCompare(bv, undefined, { sensitivity: "base" });
-    return sortDir === "asc" ? cmp : -cmp;
-  });
+  const { sorted, sortKey, sortDir, handleSort } = useTableSort(people, criteria);
+  const {
+    editId,
+    editDraft,
+    addingRow,
+    newDraft,
+    startEdit,
+    cancelEdit,
+    commitEdit,
+    setDraftField,
+    deletePerson,
+    startAdd,
+    cancelAdd,
+    commitAdd,
+    setNewField,
+  } = useTableEdit(people, criteria, onChange);
 
   function sortIcon(key: string) {
     if (sortKey !== key) return <span className="opacity-20 ml-1">↕</span>;
     return <span className="ml-1">{sortDir === "asc" ? "↑" : "↓"}</span>;
-  }
-
-  // ── Edit ─────────────────────────────────────────────────────────────────
-
-  function startEdit(person: Person) {
-    setEditId(person.id);
-    setEditDraft(structuredClone(person));
-  }
-
-  function cancelEdit() {
-    setEditId(null);
-    setEditDraft(null);
-  }
-
-  function commitEdit() {
-    if (!editDraft) return;
-    onChange(people.map((p) => p.id === editDraft.id ? editDraft : p));
-    cancelEdit();
-  }
-
-  function setDraftField(key: string, value: string) {
-    setEditDraft((d) => d ? key === "displayName" ? { ...d, displayName: value } : { ...d, criteria: { ...d.criteria, [key]: value } } : d);
-  }
-
-  // ── Delete ────────────────────────────────────────────────────────────────
-
-  function deletePerson(id: string) {
-    if (editId === id) cancelEdit();
-    onChange(people.filter((p) => p.id !== id));
-  }
-
-  // ── Add ───────────────────────────────────────────────────────────────────
-
-  function startAdd() {
-    setNewDraft(blankPerson(criteria));
-    setAddingRow(true);
-  }
-
-  function cancelAdd() {
-    setAddingRow(false);
-  }
-
-  function commitAdd() {
-    if (!newDraft.displayName.trim()) return; // name is required,
-
-    onChange([...people, { ...newDraft, displayName: newDraft.displayName.trim() }]);
-    setAddingRow(false);
-  }
-
-  function setNewField(key: string, value: string) {
-    setNewDraft((d) => key === "displayName" ? { ...d, displayName: value } : { ...d, criteria: { ...d.criteria, [key]: value } });
   }
 
   // ── Column definitions ────────────────────────────────────────────────────

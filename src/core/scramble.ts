@@ -2,6 +2,33 @@ import { shuffle } from "@std/random";
 import type { CriteriaField, CriterionDistribution, Person, ScramblerConfig, Team } from "../types.ts";
 
 // ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+
+export const TEAM_EMOJIS = [
+  "🦁",
+  "🐯",
+  "🦊",
+  "🐺",
+  "🦝",
+  "🐻",
+  "🐼",
+  "🐨",
+  "🦄",
+  "🐲",
+  "🦅",
+  "🦉",
+  "🦋",
+  "🐬",
+  "🐙",
+  "🦈",
+  "🌵",
+  "⚡",
+  "🔥",
+  "🌊",
+];
+
+// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
@@ -36,7 +63,7 @@ function groupBy<T>(items: T[], key: (item: T) => string): Map<string, T[]> {
 /**
  * Computes per-criterion value counts for a list of team members.
  */
-function computeMetrics(
+export function computeMetrics(
   members: Person[],
   criteria: CriteriaField[],
   balanceCriteria: string[],
@@ -95,6 +122,7 @@ export function scramble(
   const teams: Team[] = Array.from({ length: numTeams }, (_, i) => ({
     id: crypto.randomUUID(),
     name: `Team ${i + 1}`,
+    emoji: TEAM_EMOJIS[i % TEAM_EMOJIS.length],
     members: [],
     metrics: [],
   }));

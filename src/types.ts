@@ -68,6 +68,8 @@ export interface CriterionDistribution {
 export interface Team {
   id: string;
   name: string;
+  /** Emoji visual identity for the team. */
+  emoji: string;
   members: Person[];
   /** Diversity metrics, one entry per balanced criterion. */
   metrics: CriterionDistribution[];

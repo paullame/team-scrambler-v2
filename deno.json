@@ -3,11 +3,13 @@
   "tasks": {
     "dev": "deno run -A npm:vite",
     "build": "deno run -A npm:vite build",
-    "preview": "deno run -A npm:vite preview"
+    "preview": "deno run -A npm:vite preview",
+    "serve": "deno run -A src/server.ts"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@^1",
     "@std/csv": "jsr:@std/csv@^1",
+    "@std/http": "jsr:@std/http@^1.0.25",
     "@std/random": "jsr:@std/random@^0.1",
     "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.2.0",
     "daisyui": "npm:daisyui@^5.5.18",
