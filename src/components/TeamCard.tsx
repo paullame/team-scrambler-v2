@@ -3,12 +3,13 @@ import type { Team } from "../types.ts";
 
 interface TeamCardProps {
   team: Team;
+  index: number;
   onRename: (teamId: string, name: string) => void;
   onMoveMember: (memberId: string, fromTeamId: string, toTeamId: string) => void;
   onCycleEmoji: (teamId: string) => void;
 }
 
-export function TeamCard({ team, onRename, onMoveMember, onCycleEmoji }: TeamCardProps) {
+export function TeamCard({ team, index, onRename, onMoveMember, onCycleEmoji }: TeamCardProps) {
   const [editingName, setEditingName] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -74,9 +75,10 @@ export function TeamCard({ team, onRename, onMoveMember, onCycleEmoji }: TeamCar
   return (
     <div
       className={[
-        "card bg-base-100 border transition-shadow",
+        "card bg-base-100 border transition-shadow animate-card-enter",
         isDragOver ? "border-primary ring-2 ring-primary ring-offset-1 shadow-lg" : "border-base-300",
       ].join(" ")}
+      style={{ animationDelay: `${index * 55}ms` }}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}

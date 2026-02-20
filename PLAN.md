@@ -54,7 +54,7 @@ main panel: people table (`max-w-3xl`) + team cards grid. Team cards show member
 - Drag-and-drop (or swap button) to move a member from one team to another
 - Re-compute metrics after any swap
 
-## Phase 8 — Export
+## Phase 8 — Export [COMPLETE]
 
 **Goal**: get the results out of the browser.
 
