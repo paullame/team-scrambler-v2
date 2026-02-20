@@ -27,7 +27,7 @@ Sortable table rendering each Person row (src/components/PeopleTable.tsx) Inline
 Toggle: "number of teams" vs. "team size" mode Checkbox list of criteria columns to balance on (auto-populated from CSV headers) Settings panel component
 (src/components/ScramblerSettings.tsx)
 
-## Phase 5 — Core Scrambling Algorithm
+## Phase 5 — Core Scrambling Algorithm [COMPLETE]
 
 **Goal**: produce balanced teams.
 
