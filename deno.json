@@ -13,6 +13,7 @@
     "@std/random": "jsr:@std/random@^0.1",
     "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.2.0",
     "daisyui": "npm:daisyui@^5.5.18",
+    "html-to-image": "npm:html-to-image@^1.11.11",
     "lucide-react": "npm:lucide-react@^0.575.0",
     "react": "npm:react@^19.2.4",
     "react-dom": "npm:react-dom@^19.2.4",
@@ -37,5 +38,12 @@
     "exclude": [
       ".github/skills/"
     ]
+  },
+  "lint": {
+    "rules": {
+      "tags": [
+        "react"
+      ]
+    }
   }
 }

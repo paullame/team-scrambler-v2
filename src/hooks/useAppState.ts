@@ -1,5 +1,5 @@
 import { useState } from "react";
-import exampleCsv from "../data/example.csv?raw";
+import exampleCsv from "../../data/example.csv?raw";
 import { parseCSV } from "../core/csvParser.ts";
 import { computeMetrics, scramble, TEAM_EMOJIS } from "../core/scramble.ts";
 import type { CriteriaField, Person, ScramblerConfig, Team } from "../types.ts";

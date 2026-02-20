@@ -1,5 +1,7 @@
-import { Shuffle } from "lucide-react";
+import { useRef } from "react";
+import { Download, Image, Shuffle } from "lucide-react";
 import { useAppState } from "./hooks/useAppState.ts";
+import { useExport } from "./hooks/useExport.ts";
 import { CsvDropZone } from "./components/CsvDropZone.tsx";
 import { PeopleTable } from "./components/PeopleTable.tsx";
 import { ScramblerSettings } from "./components/ScramblerSettings.tsx";
@@ -21,6 +23,9 @@ function App() {
     handleCycleEmoji,
     handleMoveMember,
   } = useAppState();
+
+  const gridRef = useRef<HTMLDivElement>(null);
+  const { exportCsv, exportPng, isExportingPng } = useExport(teams, criteria, gridRef);
 
   return (
     // dir="auto" puts the sidebar on the leading edge for both LTR and RTL locales
@@ -66,6 +71,28 @@ function App() {
             <Shuffle className="size-4" />
             Scramble!
           </button>
+
+          {/* ── Export ─────────────────────────────────────────────────── */}
+          <div className="flex flex-col gap-2">
+            <button
+              type="button"
+              className="btn btn-outline btn-sm gap-2"
+              onClick={exportCsv}
+              disabled={teams.length === 0}
+            >
+              <Download className="size-4" />
+              Export CSV
+            </button>
+            <button
+              type="button"
+              className="btn btn-outline btn-sm gap-2"
+              onClick={exportPng}
+              disabled={teams.length === 0 || isExportingPng}
+            >
+              <Image className="size-4" />
+              {isExportingPng ? "Rendering…" : "Export PNG"}
+            </button>
+          </div>
         </aside>
 
         {/* Main content */}
@@ -79,7 +106,7 @@ function App() {
           </div>
 
           {teams.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div ref={gridRef} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {teams.map((team) => (
                 <TeamCard
                   key={team.id}

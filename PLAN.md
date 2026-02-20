@@ -77,7 +77,7 @@ main panel: people table (`max-w-3xl`) + team cards grid. Team cards show member
 
 Worth doing alongside the next phases rather than as dedicated sprints.
 
-### 1. Extract app state into a custom hook
+### 1. Extract app state into a custom hook [COMPLETE]
 
 `App.tsx` owns too many `useState` calls and handler functions. Moving them into `src/hooks/useAppState.ts` would make the component a thin presentation shell
 and make state transitions independently testable.
@@ -92,7 +92,7 @@ The `compact` boolean prop forces the component to render two completely differe
 `CriterionDistribution.ratios` is always `count / teamSize` and can be computed where it is displayed. Removing it from `types.ts` and `scramble.ts` reduces the
 data model surface and eliminates a category of tests.
 
-### 4. Break up `PeopleTable`
+### 4. Break up `PeopleTable` [COMPLETE]
 
 The component owns sort state, edit state, add state, and all their handlers. Extracting `useTableEdit` and `useTableSort` hooks would isolate concerns and make
 each piece unit-testable.
