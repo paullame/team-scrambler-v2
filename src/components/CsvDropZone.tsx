@@ -8,9 +8,11 @@ interface Props {
   error?: string;
   /** Name of the currently loaded file, if any. */
   fileName?: string;
+  /** Render as a compact button row instead of the full drop-zone card. */
+  compact?: boolean;
 }
 
-export function CsvDropZone({ onLoad, error, fileName }: Props) {
+export function CsvDropZone({ onLoad, error, fileName, compact }: Props) {
   const [dragging, setDragging] = useState(false);
   const [readError, setReadError] = useState<string>();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -32,7 +34,7 @@ export function CsvDropZone({ onLoad, error, fileName }: Props) {
     reader.readAsText(file, "utf-8");
   }
 
-  function handleDrop(e: React.DragEvent<HTMLDivElement>) {
+  function handleDrop(e: React.DragEvent<HTMLElement>) {
     e.preventDefault();
     setDragging(false);
     const file = e.dataTransfer.files[0];
@@ -49,6 +51,59 @@ export function CsvDropZone({ onLoad, error, fileName }: Props) {
   const zoneBase =
     "flex flex-col items-center gap-2 p-8 border-2 border-dashed rounded-box cursor-pointer transition-colors outline-none select-none bg-base-100 border-base-300";
   const zoneOver = "border-primary bg-primary/5";
+
+  if (compact) {
+    const miniBase =
+      "flex flex-col items-center gap-2 py-5 px-4 border-2 border-dashed rounded-box cursor-pointer transition-colors outline-none select-none border-base-300";
+    const miniOver = "border-primary bg-primary/5";
+    return (
+      <div>
+        <input
+          ref={inputRef}
+          type="file"
+          accept=".csv,text/csv"
+          className="hidden"
+          onChange={handleInputChange}
+          aria-hidden
+          tabIndex={-1}
+        />
+        <div
+          className={`${miniBase} ${dragging ? miniOver : "hover:border-base-content/40 focus-visible:border-base-content/40"}`}
+          onClick={() => inputRef.current?.click()}
+          onKeyDown={(e) => e.key === "Enter" && inputRef.current?.click()}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragging(true);
+          }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={handleDrop}
+          role="button"
+          tabIndex={0}
+          aria-label="Upload a CSV file"
+        >
+          <UploadCloud className="size-6 shrink-0 opacity-60" aria-hidden />
+          <span className="text-sm text-center leading-snug">
+            {fileName
+              ? (
+                <>
+                  <strong className="opacity-100">{fileName}</strong>
+                  <br />
+                  <span className="opacity-50 text-xs">drop or click to replace</span>
+                </>
+              )
+              : (
+                <>
+                  <strong>Drop a CSV here</strong>
+                  <br />
+                  <span className="opacity-50 text-xs">or click to browse</span>
+                </>
+              )}
+          </span>
+        </div>
+        {displayError && <p className="text-xs text-error mt-1">{displayError}</p>}
+      </div>
+    );
+  }
 
   return (
     <div

@@ -47,6 +47,16 @@ deno test -A
 
 ## Features
 
+### Implemented
+
+- **CSV Import** — drag-and-drop or click-to-upload; supports multiple name column formats (`firstName`/`lastName`/`fullName`/`displayName`/`email`); loads `example.csv` on first open
+- **Individuals Table** — sortable columns, inline add / edit / delete rows, datalist hints for known criterion values
+- **Scrambler Settings** — toggle between "number of teams" and "team size" modes; live preview of the derived value; per-criterion balance checkboxes
+- **Scrambling Algorithm** — stratified shuffle with rotating round-robin offset to prevent clustering; reproducible given the same input
+- **Diversity Metrics** — per-team ratio badges for each balance criterion, sorted by proportion, with raw count tooltip
+- **No-scroll layout** — viewport-filling sidebar + main panel; sidebar is leading-edge (LTR/RTL-aware via `dir="auto"`)
+- **21 unit tests** — `csvParser.test.ts` (16) + `scramble.test.ts` (21), all passing
+
 ## Backlog
 
 ### Core logic
