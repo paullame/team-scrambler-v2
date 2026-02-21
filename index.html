@@ -1,23 +1,21 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="egg">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Team Scrambler</title>
+    <!-- Apply stored theme before first paint to avoid flash -->
+    <script>
+      try {
+        const t = localStorage.getItem("team-scrambler-theme");
+        if (t === "egg" || t === "egg-dark") document.documentElement.setAttribute("data-theme", t);
+      } catch {}
+    </script>
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Team Scrambler</title>
-  <!-- Apply stored theme before first paint to avoid flash -->
-  <script>
-    try {
-      const t = localStorage.getItem("team-scrambler-theme");
-      if (t === "egg" || t === "egg-dark") document.documentElement.setAttribute("data-theme", t);
-    } catch { }
-  </script>
-</head>
-
-<body>
-  <div id="root"></div>
-  <script type="module" src="/src/main.tsx"></script>
-</body>
-
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>
