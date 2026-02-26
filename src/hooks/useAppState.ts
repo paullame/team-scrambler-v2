@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import exampleCsv from "../../data/example.csv?raw";
 import { parseCSV } from "../core/csvParser.ts";
-import { computeMetrics, scramble, TEAM_EMOJIS } from "../core/scramble.ts";
-import type { CriteriaField, Person, ScramblerConfig, Team } from "../types.ts";
+import { computeMetrics, computeQuality, scramble, TEAM_EMOJIS } from "../core/scramble.ts";
+import type { CriteriaField, Person, ScrambleQuality, ScramblerConfig, Team } from "../types.ts";
 
 // ---------------------------------------------------------------------------
 // Module-level defaults (computed once at import time)
@@ -40,6 +40,17 @@ export function useAppState() {
     defaultConfig(DEFAULT_PARSED.criteria),
   );
   const [teams, setTeams] = useState<Team[]>([]);
+  const [quality, setQuality] = useState<ScrambleQuality | null>(null);
+
+  // Recompute quality whenever teams change (covers initial scramble + manual swaps).
+  useEffect(() => {
+    if (teams.length === 0) {
+      setQuality(null);
+      return;
+    }
+    setQuality(computeQuality(teams, config.balanceCriteria, criteria));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [teams]);
 
   // ── CSV loading ────────────────────────────────────────────────────────
 
@@ -124,6 +135,7 @@ export function useAppState() {
     config,
     setConfig,
     teams,
+    quality,
     handleLoad,
     handleScramble,
     handleRename,

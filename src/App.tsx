@@ -5,6 +5,7 @@ import { useExport } from "./hooks/useExport.ts";
 import { useTheme } from "./hooks/useTheme.ts";
 import { CsvDropZone } from "./components/CsvDropZone.tsx";
 import { PeopleTable } from "./components/PeopleTable.tsx";
+import { QualityBanner } from "./components/QualityBanner.tsx";
 import { ScramblerSettings } from "./components/ScramblerSettings.tsx";
 import { TeamCard } from "./components/TeamCard.tsx";
 
@@ -18,6 +19,7 @@ function App() {
     config,
     setConfig,
     teams,
+    quality,
     handleLoad,
     handleScramble,
     handleRename,
@@ -76,6 +78,8 @@ function App() {
               onChange={setPeople}
             />
           </div>
+
+          {quality !== null && <QualityBanner quality={quality} />}
 
           {teams.length > 0 && (
             <div ref={gridRef} className="grid grid-cols-[repeat(auto-fill,minmax(min(31rem,100%),1fr))] gap-4">

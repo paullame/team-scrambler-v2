@@ -63,6 +63,35 @@ export interface CriterionDistribution {
 }
 
 /**
+ * Balance quality for a single criterion after scrambling.
+ */
+export interface CriterionQuality {
+  key: string;
+  label: string;
+  /**
+   * 0 (fully imbalanced) → 1 (perfectly balanced), normalised against the
+   * theoretical worst-case distribution for this criterion and team count.
+   */
+  score: number;
+  /**
+   * True when at least one value has fewer representatives than teams, meaning
+   * perfect balance is mathematically impossible — some teams will always have
+   * 0 of that value.
+   */
+  limited: boolean;
+}
+
+/**
+ * Aggregate quality report produced alongside the scramble result.
+ */
+export interface ScrambleQuality {
+  /** Per-criterion scores. */
+  criteria: CriterionQuality[];
+  /** Mean of all per-criterion scores (0–1). */
+  overall: number;
+}
+
+/**
  * A single team produced by the scrambler.
  */
 export interface Team {
