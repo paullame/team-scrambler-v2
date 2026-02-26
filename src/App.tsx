@@ -1,5 +1,5 @@
-import { useRef } from "react";
-import { Download, Image, Menu, Moon, Shuffle, Sun } from "lucide-react";
+import { useRef, useState } from "react";
+import { Download, Image, Menu, Moon, Shuffle, Sun, Trophy, Users } from "lucide-react";
 import { useAppState } from "./hooks/useAppState.ts";
 import { useExport } from "./hooks/useExport.ts";
 import { useTheme } from "./hooks/useTheme.ts";
@@ -30,6 +30,13 @@ function App() {
   const gridRef = useRef<HTMLDivElement>(null);
   const { exportCsv, exportPng, isExportingPng } = useExport(teams, criteria, gridRef);
   const { isDark, toggleTheme } = useTheme();
+
+  const [activeTab, setActiveTab] = useState<"participants" | "results">("participants");
+
+  function handleScrambleAndSwitch() {
+    handleScramble();
+    setActiveTab("results");
+  }
 
   return (
     // drawer: sidebar always-visible on lg+, slide-in overlay on smaller screens
@@ -69,31 +76,71 @@ function App() {
         </header>
 
         {/* ── Body ─────────────────────────────────────────────────────────── */}
+        {/* Tab bar */}
+        <div className="shrink-0 flex border-b border-base-300 bg-base-100 px-4">
+          <button
+            type="button"
+            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
+              activeTab === "participants" ? "border-primary text-primary" : "border-transparent opacity-60 hover:opacity-100"
+            }`}
+            onClick={() => setActiveTab("participants")}
+          >
+            <Users className="size-4" />
+            Participants
+            {people.length > 0 && <span className="badge badge-sm badge-ghost">{people.length}</span>}
+          </button>
+          <button
+            type="button"
+            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
+              activeTab === "results" ? "border-primary text-primary" : "border-transparent opacity-60 hover:opacity-100"
+            }`}
+            onClick={() => setActiveTab("results")}
+          >
+            <Trophy className="size-4" />
+            Results
+            {teams.length > 0 && <span className="badge badge-sm badge-ghost">{teams.length} teams</span>}
+          </button>
+        </div>
+
         {/* Main scrollable area */}
         <main className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
-          <div className="max-w-3xl">
-            <PeopleTable
-              people={people}
-              criteria={criteria}
-              onChange={setPeople}
-            />
-          </div>
-
-          {quality !== null && <QualityBanner quality={quality} />}
-
-          {teams.length > 0 && (
-            <div ref={gridRef} className="grid grid-cols-[repeat(auto-fill,minmax(min(31rem,100%),1fr))] gap-4">
-              {teams.map((team, i) => (
-                <TeamCard
-                  key={team.id}
-                  index={i}
-                  team={team}
-                  onRename={handleRename}
-                  onMoveMember={handleMoveMember}
-                  onCycleEmoji={handleCycleEmoji}
-                />
-              ))}
+          {activeTab === "participants" && (
+            <div className="max-w-3xl">
+              <PeopleTable
+                people={people}
+                criteria={criteria}
+                onChange={setPeople}
+              />
             </div>
+          )}
+
+          {activeTab === "results" && (
+            <>
+              {teams.length === 0
+                ? (
+                  <div className="flex flex-col items-center justify-center flex-1 gap-3 opacity-40">
+                    <Trophy className="size-12" />
+                    <p className="text-sm">No results yet — hit Scramble! to generate teams.</p>
+                  </div>
+                )
+                : (
+                  <>
+                    {quality !== null && <QualityBanner quality={quality} />}
+                    <div ref={gridRef} className="grid grid-cols-[repeat(auto-fill,minmax(min(31rem,100%),1fr))] gap-4">
+                      {teams.map((team, i) => (
+                        <TeamCard
+                          key={team.id}
+                          index={i}
+                          team={team}
+                          onRename={handleRename}
+                          onMoveMember={handleMoveMember}
+                          onCycleEmoji={handleCycleEmoji}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
+            </>
           )}
         </main>
       </div>
@@ -124,7 +171,7 @@ function App() {
           <button
             type="button"
             className="btn btn-primary gap-2 mt-auto"
-            onClick={handleScramble}
+            onClick={handleScrambleAndSwitch}
             disabled={people.length === 0}
           >
             <Shuffle className="size-4" />

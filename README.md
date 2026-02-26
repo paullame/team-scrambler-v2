@@ -47,46 +47,67 @@ deno test -A
 
 ## Features
 
-### Implemented
+### CSV Import
 
-- **CSV Import** — drag-and-drop or click-to-upload; supports multiple name column formats (`firstName`/`lastName`/`fullName`/`displayName`/`email`); loads
-  `example.csv` on first open
-- **Individuals Table** — sortable columns, inline add / edit / delete rows, datalist hints for known criterion values
-- **Scrambler Settings** — toggle between "number of teams" and "team size" modes; live preview of the derived value; per-criterion balance checkboxes
-- **Scrambling Algorithm** — stratified shuffle with rotating round-robin offset to prevent clustering; reproducible given the same input
-- **Diversity Metrics** — per-team ratio badges for each balance criterion, sorted by proportion, with raw count tooltip
-- **No-scroll layout** — viewport-filling sidebar + main panel; sidebar is leading-edge (LTR/RTL-aware via `dir="auto"`)
-- **21 unit tests** — `csvParser.test.ts` (16) + `scramble.test.ts` (21), all passing
+- Drag-and-drop or click-to-upload a CSV file in the sidebar
+- Automatically detects name columns (`firstName`/`lastName`, `displayName`, `fullName`, `email`) and treats all other columns as balance criteria
+- Loads `example.csv` on first open so the tool is immediately usable
+- Parse error messages are displayed inline
 
-## Backlog
+### Individuals Table
 
-### Core logic
+- Displays all imported people in a sortable table
+- Inline row editing: add, edit, and delete rows directly in the table
+- Column headers are derived from the CSV — no configuration needed
+- Datalist hints suggest known values when editing a criterion cell
 
-- **Flexible Team Distribution**: Distribute individuals into teams based on size or count.
-- **Balancing Options**: define your own criteria for balancing (for example age, department, gender, etc...)
-- **Diversity Metrics**: Analyze the diversity of teams after distribution.
-- **CSV Import**: Load individuals from a CSV file and automatically create criteria based on columns, Supports multiple name formats for parsing.
+### Scrambler Settings
 
-### UI
+- Choose between **number of teams** mode or **team size** mode, with a live preview of the derived value
+- Checkbox list of balance criteria, auto-populated from the CSV headers — select which ones the algorithm should optimise for
 
-- CSV drag & drop or click to upload
-- scrambler settings
-- preview individuals data in table
-  - edit, add, delete rows
-- load with example data by default
-- big engaging scramble button
-- team cards display with team name, members, diversity metrics
-- edit teams name, emoji, swap members for small adjustment
-- export to csv
-- export to png
-- light and dark themes
+### Scrambling Algorithm
 
-### Look and feel
+Greedy assignment with a cost function — $O(n \cdot T \cdot k)$:
 
-- theme inspired by scrambled eggs
-- modern accessible layout
+1. Shuffle all people randomly
+2. For each person, assign them to the team with the lowest cost, where cost = team size (size balance) + over-representation penalties per criterion (value
+   balance)
+3. Each criterion is optimised independently, so adding more criteria does not degrade balance on others
 
-# React Template with Vite and Deno
+See [ALGORITHM.md](ALGORITHM.md) for the full technical specification.
 
-This is a GitHub template project to set up a full-stack web app with [React](https://react.dev/) for front-end and [Hono](https://hono.dev) for backend with
-TypeScript running on [Deno](https://deno.com). It uses [Vite](https://vite.dev) as the dev server.
+### Team Cards
+
+- Results displayed as a responsive card grid, one card per team
+- Each card lists its members and shows per-criterion ratio badges (with raw count tooltip), sorted by proportion
+- Click a team name to rename it inline
+- Click the emoji to cycle through 20 animal / nature icons
+- Drag a member chip onto another team's card to move them; metrics update immediately
+
+### Balance Quality Report
+
+Shown after each scramble, above the team cards:
+
+- **Overall score** (0–100%) — mean of per-criterion scores
+- **Per-criterion score** with a colour-coded progress bar (green / yellow / red)
+- Scoring mode is selected automatically by cardinality:
+  - **Ratio mode** (few distinct values, e.g. gender) — measures whether each team reflects global proportions
+  - **Diversity mode** (many distinct values, e.g. entity, department) — measures what fraction of all distinct values appear in each team
+- Scores are normalised to the _best achievable_ result given integer constraints, not to a theoretical perfect — 100% means the algorithm did as well as
+  mathematically possible
+- A ⚠️ flag with tooltip highlights criteria where perfect balance is impossible (e.g. not enough representatives to place one in every team)
+
+### Export
+
+- **Export CSV** — one row per person with a `team` column appended; downloaded as a `.csv` file
+- **Export PNG** — snapshot of the team cards grid, downloaded as a `.png` image
+- Both buttons are disabled until teams have been generated
+
+### Look & Feel
+
+- Scrambled-eggs-inspired colour palette: warm yellows and off-whites for light mode, deep yolk-amber accent
+- Light / dark theme toggle, preference persisted in `localStorage`
+- Viewport-filling no-scroll layout: sidebar panel + scrollable main area
+- Responsive: sidebar collapses into a slide-in drawer on narrow screens (RTL/LTR-aware via `dir="auto"`)
+- Team cards fade and slide in on first appearance
