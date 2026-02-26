@@ -69,14 +69,23 @@ export interface CriterionQuality {
   key: string;
   label: string;
   /**
-   * 0 (fully imbalanced) → 1 (perfectly balanced), normalised against the
-   * theoretical worst-case distribution for this criterion and team count.
+   * How the score was computed.
+   * - "ratio": low-cardinality (≤ numTeams distinct values) — measures whether
+   *   each value's global proportion is evenly reflected in every team.
+   * - "diversity": high-cardinality (> numTeams distinct values) — measures
+   *   what fraction of all distinct values appear in each team.
+   */
+  mode: "ratio" | "diversity";
+  /**
+   * 0 (fully imbalanced) → 1 (perfectly balanced / best achievable).
+   * Normalised against the theoretical best and worst case for this criterion,
+   * team count, and team sizes.
    */
   score: number;
   /**
-   * True when at least one value has fewer representatives than teams, meaning
-   * perfect balance is mathematically impossible — some teams will always have
-   * 0 of that value.
+   * True when perfect balance is mathematically impossible given the data:
+   * - ratio mode: at least one value has fewer representatives than teams.
+   * - diversity mode: total distinct values exceed at least one team's size.
    */
   limited: boolean;
 }

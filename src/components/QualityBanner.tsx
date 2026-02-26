@@ -19,7 +19,8 @@ function progressColorClass(score: number): string {
 export function QualityBanner({ quality }: Props) {
   if (quality.criteria.length === 0) return null;
 
-  const hasLimited = quality.criteria.some((c) => c.limited);
+  const hasLimitedRatio = quality.criteria.some((c) => c.limited && c.mode === "ratio");
+  const hasLimitedDiversity = quality.criteria.some((c) => c.limited && c.mode === "diversity");
 
   return (
     <div className="card bg-base-100 border border-base-300 max-w-3xl" aria-label="Balance quality report">
@@ -48,8 +49,10 @@ export function QualityBanner({ quality }: Props) {
             {c.limited && (
               <span
                 className="tooltip cursor-help"
-                data-tip="Fewer people than teams share this value — perfect balance is not achievable"
-                aria-label="Balance limited by small group size"
+                data-tip={c.mode === "diversity"
+                  ? "Teams are smaller than the number of distinct values — not all values can appear in every team"
+                  : "Fewer people than teams share this value — perfect balance is not achievable"}
+                aria-label="Balance limited by data constraints"
               >
                 ⚠️
               </span>
@@ -57,11 +60,16 @@ export function QualityBanner({ quality }: Props) {
           </div>
         ))}
 
-        {/* Footer note when theoretical limit is hit */}
-        {hasLimited && (
+        {/* Footer notes */}
+        {hasLimitedRatio && (
           <p className="text-xs opacity-50 leading-snug">
-            Some criteria are capped below 100% — not enough people per value to have at least one in every team. Consider fewer teams or removing that
-            criterion.
+            ⚠️ Some values have fewer representatives than teams — perfect ratio balance is not achievable. Consider fewer teams or removing that criterion.
+          </p>
+        )}
+        {hasLimitedDiversity && (
+          <p className="text-xs opacity-50 leading-snug">
+            ⚠️ Some criteria have more distinct values than people per team — not all values can appear in every team. This is measured as diversity (distinct
+            values per team) rather than ratio balance.
           </p>
         )}
       </div>

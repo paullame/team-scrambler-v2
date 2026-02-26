@@ -62,15 +62,23 @@ export function computeMetrics(
 // ---------------------------------------------------------------------------
 
 /**
- * Measures how well the current team distribution matches the global value
- * ratios for each balance criterion.
+ * Measures how well the current team distribution matches the global
+ * distribution for each balance criterion.
  *
- * Score is normalised per criterion: 1 = perfectly balanced, 0 = fully
- * concentrated.  The normalisation is based on the theoretical worst case for
- * the given number of teams, so scores are directly comparable across runs and
- * datasets.
+ * Two scoring modes are selected automatically based on cardinality:
  *
- * Uses the team members as the source of truth (consistent after manual swaps).
+ * **Ratio mode** (distinctValues ≤ numTeams — e.g. gender, mancom)
+ *   Measures whether each value's global proportion is reflected in every
+ *   team.  Normalised between the best achievable MAD (integer rounding) and
+ *   the worst-case MAD (all count in one team).
+ *
+ * **Diversity mode** (distinctValues > numTeams — e.g. entity, department)
+ *   Measures what fraction of all distinct values appear in each team.
+ *   Normalised between best achievable (limited by team size) and worst
+ *   (only one distinct value per team).
+ *
+ * Uses team members as the source of truth so quality updates correctly
+ * after manual member swaps.
  *
  * @param teams            The current team array (with populated metrics).
  * @param balanceCriteria  Criterion keys that were balanced.
@@ -86,18 +94,16 @@ export function computeQuality(
   }
 
   const numTeams = teams.length;
-  // Derive the population from the actual team members so quality stays
-  // consistent after manual member swaps.
   const everyone: Person[] = teams.flatMap((t) => t.members);
   const n = everyone.length;
   if (n === 0) return { criteria: [], overall: 1 };
 
-  // Global value counts across all members.
+  // Build global value counts using original case to match team.metrics.
   const globalCounts: Record<string, Record<string, number>> = {};
   for (const key of balanceCriteria) {
     globalCounts[key] = {};
     for (const p of everyone) {
-      const val = (p.criteria[key] ?? "").toLowerCase();
+      const val = p.criteria[key] ?? "";
       if (val) globalCounts[key][val] = (globalCounts[key][val] ?? 0) + 1;
     }
   }
@@ -107,63 +113,119 @@ export function computeQuality(
     .map((c) => {
       const gc = globalCounts[c.key] ?? {};
       const values = Object.keys(gc);
+      const V = values.length;
 
-      if (values.length === 0) {
-        return { key: c.key, label: c.label, score: 1, limited: false };
+      if (V === 0) {
+        return { key: c.key, label: c.label, mode: "ratio", score: 1, limited: false };
       }
 
-      // Weighted sum of (actual - best) and (worst - best) across values.
-      // Normalising against [bestMAD, worstMAD] instead of [0, worstMAD]
-      // ensures that values whose count is not divisible by numTeams still
-      // score 1 when the algorithm achieves the best possible distribution
-      // (e.g. 1 SLS person across 2 teams: bestMAD == worstMAD, so score = 1).
-      let weightedActualExcess = 0;
-      let weightedRange = 0;
-      let limited = false;
-
-      const avgTeamSize = n / numTeams;
-
-      for (const val of values) {
-        const count = gc[val];
-        const R = count / n; // global ratio for this value
-
-        // Flag: fewer representatives than teams → can't have ≥1 in every team.
-        if (count < numTeams) limited = true;
-
-        // Observed MAD: mean |teamRatio - globalRatio| across teams.
-        let mad = 0;
-        for (const team of teams) {
-          const m = team.metrics.find((x) => x.key === c.key);
-          mad += Math.abs((m?.ratios[val] ?? 0) - R);
-        }
-        mad /= numTeams;
-
-        // Best-achievable MAD: distribute count as evenly as possible
-        // (floor_q in T-r teams, floor_q+1 in r teams).
-        const floorQ = Math.floor(count / numTeams);
-        const r = count % numTeams;
-        const bestMAD = (r * Math.abs((floorQ + 1) / avgTeamSize - R) +
-          (numTeams - r) * Math.abs(floorQ / avgTeamSize - R)) /
-          numTeams;
-
-        // Worst-case MAD: all count people in one team, zero elsewhere.
-        const worstMAD = 2 * R * (numTeams - 1) / numTeams;
-
-        const range = worstMAD - bestMAD;
-        weightedActualExcess += R * Math.max(0, mad - bestMAD);
-        weightedRange += R * range;
+      // ── Mode selection ──────────────────────────────────────────────────
+      // High-cardinality: more distinct values than teams → diversity metric.
+      // Low-cardinality: ratio metric (existing MAD approach).
+      if (V > numTeams) {
+        return scoreDiversity(c.key, c.label, teams, V);
+      } else {
+        return scoreRatio(c.key, c.label, values, gc, n, numTeams, teams);
       }
-
-      // score = 1 when actualMAD == bestMAD; 0 when actualMAD == worstMAD.
-      // When range == 0 (only one possible outcome), score = 1.
-      const score = weightedRange > 0 ? Math.max(0, 1 - weightedActualExcess / weightedRange) : 1;
-
-      return { key: c.key, label: c.label, score, limited };
     });
 
-  const overall = criteriaQuality.length > 0 ? criteriaQuality.reduce((s, c) => s + c.score, 0) / criteriaQuality.length : 1;
+  const overall = criteriaQuality.length > 0 ? criteriaQuality.reduce((s, q) => s + q.score, 0) / criteriaQuality.length : 1;
 
   return { criteria: criteriaQuality, overall };
+}
+
+// ---------------------------------------------------------------------------
+// Quality helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Ratio mode: low-cardinality criterion (e.g. gender, mancom).
+ * Normalised MAD scored between [bestAchievableMAD, worstMAD].
+ */
+function scoreRatio(
+  key: string,
+  label: string,
+  values: string[],
+  gc: Record<string, number>,
+  n: number,
+  numTeams: number,
+  teams: Team[],
+): CriterionQuality {
+  const avgTeamSize = n / numTeams;
+  let weightedActualExcess = 0;
+  let weightedRange = 0;
+  let limited = false;
+
+  for (const val of values) {
+    const count = gc[val];
+    const R = count / n;
+
+    if (count < numTeams) limited = true;
+
+    // Observed MAD across teams.
+    let mad = 0;
+    for (const team of teams) {
+      const m = team.metrics.find((x) => x.key === key);
+      mad += Math.abs((m?.ratios[val] ?? 0) - R);
+    }
+    mad /= numTeams;
+
+    // Best-achievable MAD: most even integer split (floor+1 in r teams, floor in rest).
+    const floorQ = Math.floor(count / numTeams);
+    const r = count % numTeams;
+    const bestMAD = (r * Math.abs((floorQ + 1) / avgTeamSize - R) +
+      (numTeams - r) * Math.abs(floorQ / avgTeamSize - R)) /
+      numTeams;
+
+    // Worst-case MAD: all count in one team.
+    const worstMAD = 2 * R * (numTeams - 1) / numTeams;
+
+    const range = worstMAD - bestMAD;
+    weightedActualExcess += R * Math.max(0, mad - bestMAD);
+    weightedRange += R * range;
+  }
+
+  const score = weightedRange > 0 ? Math.max(0, 1 - weightedActualExcess / weightedRange) : 1;
+
+  return { key, label, mode: "ratio", score, limited };
+}
+
+/**
+ * Diversity mode: high-cardinality criterion (e.g. entity, department, city).
+ * Measures what fraction of all V distinct values appears in each team,
+ * normalised between best achievable (team-size limited) and worst (1/V).
+ */
+function scoreDiversity(
+  key: string,
+  label: string,
+  teams: Team[],
+  V: number,
+): CriterionQuality {
+  let observedSum = 0;
+  let bestSum = 0;
+  const worst = 1 / V; // worst-case: only 1 distinct value per team
+
+  let limited = false;
+
+  for (const team of teams) {
+    const teamSize = team.members.length;
+    const m = team.metrics.find((x) => x.key === key);
+    const distinctInTeam = m ? Object.keys(m.counts).length : 0;
+
+    observedSum += distinctInTeam / V;
+
+    const maxDistinct = Math.min(V, teamSize);
+    bestSum += maxDistinct / V;
+
+    if (maxDistinct < V) limited = true;
+  }
+
+  const observed = observedSum / teams.length;
+  const best = bestSum / teams.length;
+
+  const score = best > worst ? Math.max(0, (observed - worst) / (best - worst)) : 1;
+
+  return { key, label, mode: "diversity", score, limited };
 }
 
 /**

@@ -1,21 +1,21 @@
 firstName,lastName,displayName,gender,entity,mancom
-Alice,MARTIN,Alice MARTIN,female,MKT,false
-Benjamin,DUPONT,Benjamin DUPONT,male,OPS,true
-Claire,DURAND,Claire DURAND,female,HR,false
+Alice,MARTIN,Alice MARTIN,female,Marketing,false
+Benjamin,DUPONT,Benjamin DUPONT,male,Operations,true
+Claire,DURAND,Claire DURAND,female,Human Resources,false
 David,LEROY,David LEROY,male,IT,false
 Emma,PETIT,Emma PETIT,female,IT,true
-François,MOREAU,François MOREAU,male,OPS,false
-Gabrielle,ROUX,Gabrielle ROUX,female,MKT,false
-Hugo,GIRARD,Hugo GIRARD,male,HR,true
-Isabelle,LAMBERT,Isabelle LAMBERT,female,FIN,false
+François,MOREAU,François MOREAU,male,Operations,false
+Gabrielle,ROUX,Gabrielle ROUX,female,Marketing,false
+Hugo,GIRARD,Hugo GIRARD,male,Human Resources,true
+Isabelle,LAMBERT,Isabelle LAMBERT,female,Finance,false
 Julien,FAURE,Julien FAURE,male,IT,false
-Karine,BLANC,Karine BLANC,female,FIN,true
-Laurent,GARNIER,Laurent GARNIER,male,OPS,false
-Marie,CHEVALIER,Marie CHEVALIER,female,MKT,false
-Nicolas,MARCHAND,Nicolas MARCHAND,male,FIN,true
-Océane,BARBIER,Océane BARBIER,female,HR,false
-Paul,RENARD,Paul RENARD,male,RD,false
-Quentin,LEMOINE,Quentin LEMOINE,male,RD,true
-Roxane,BENOIT,Roxane BENOIT,female,OPS,false
-Sébastien,PERRIN,Sébastien PERRIN,male,MKT,false
-Thérèse,MULLER,Thérèse MULLER,female,SLS,true
+Karine,BLANC,Karine BLANC,female,Finance,true
+Laurent,GARNIER,Laurent GARNIER,male,Operations,false
+Marie,CHEVALIER,Marie CHEVALIER,female,Marketing,false
+Nicolas,MARCHAND,Nicolas MARCHAND,male,Finance,true
+Océane,BARBIER,Océane BARBIER,female,Human Resources,false
+Paul,RENARD,Paul RENARD,male,Research,false
+Quentin,LEMOINE,Quentin LEMOINE,male,Research,true
+Roxane,BENOIT,Roxane BENOIT,female,Operations,false
+Sébastien,PERRIN,Sébastien PERRIN,male,Marketing,false
+Thérèse,MULLER,Thérèse MULLER,female,Sales,true
