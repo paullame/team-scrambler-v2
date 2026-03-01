@@ -1,5 +1,11 @@
 # Plan (to be updated along the way)
 
+## New plan
+
+- improve testing / handle edge cases for csv imports, etc...
+- SEO improvements
+- Progressive Web Apps
+
 ## Phase 1 — Data Model & CSV Parsing [COMPLETE]
 
 **Goal**: establish the shared data contracts and parsing logic everything depends on.
@@ -112,5 +118,3 @@ Basic `aria-label` attributes are in place but no systematic audit has been done
 through team cards, and focus management after the Scramble button fires.
 
 ---
-
-Suggested order: 7 → tech-debt #1 & #4 (while building `TeamCard`) → 8 → 9 → remaining tech debt.
