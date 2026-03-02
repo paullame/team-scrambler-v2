@@ -1,5 +1,5 @@
 import { assertEquals, assertGreater, assertLess } from "@std/assert";
-import { computeQuality, scramble } from "./scramble.ts";
+import { computeMetrics, computeQuality, scramble } from "./scramble.ts";
 import { createBalancedTestPopulation, createTestPerson } from "./testHelpers.ts";
 import type { CriteriaField, Person, ScramblerConfig } from "../types.ts";
 
@@ -319,4 +319,95 @@ Deno.test("Quality – diversity mode: all distinct values visible in large team
   const deptQuality = quality.criteria.find((c) => c.key === "dept");
   assertEquals(deptQuality?.mode, "diversity");
   assertGreater(deptQuality?.score ?? 0, 0.5);
+});
+
+// ---------------------------------------------------------------------------
+// scoreRatio / scoreDiversity edge cases
+// ---------------------------------------------------------------------------
+
+Deno.test("computeQuality – single team: score is 1 (nothing to compare)", () => {
+  // With only 1 team, MAD is trivially 0 → best achievable, score = 1
+  const people: Person[] = Array.from({ length: 5 }, (_, i) =>
+    createTestPerson({
+      displayName: `P${i}`,
+      criteria: { gender: i < 3 ? "female" : "male" },
+    }));
+  const criteria: CriteriaField[] = [{ key: "gender", label: "Gender", values: ["female", "male"] }];
+  const teams = scramble(people, criteria, { mode: "teamCount", teamCount: 1, teamSize: 5, balanceCriteria: ["gender"] });
+  const quality = computeQuality(teams, ["gender"], criteria);
+  assertEquals(quality.overall, 1);
+  assertEquals(quality.criteria[0].score, 1);
+});
+
+Deno.test("computeQuality – criterion in balanceCriteria but no member has a value → score is 1", () => {
+  // Everyone has an empty/missing value for the balanced criterion
+  const people: Person[] = Array.from({ length: 8 }, (_, i) => createTestPerson({ displayName: `P${i}`, criteria: {} })); // no "rank" key
+  const criteria: CriteriaField[] = [{ key: "rank", label: "Rank", values: [] }];
+  const teams = scramble(people, criteria, { mode: "teamCount", teamCount: 2, teamSize: 4, balanceCriteria: ["rank"] });
+  const quality = computeQuality(teams, ["rank"], criteria);
+  // V=0 branch: should short-circuit to score 1
+  assertEquals(quality.criteria[0].score, 1);
+});
+
+Deno.test("computeQuality – immediately after manual member swap, quality reflects new arrangement", () => {
+  const { people, criteria } = createBalancedTestPopulation(8);
+  const config: ScramblerConfig = { mode: "teamCount", teamCount: 2, teamSize: 4, balanceCriteria: ["gender"] };
+  const teams = scramble(people, criteria, config);
+
+  // Manually move all females to team 0, all males to team 1 (worst case)
+  const females = people.filter((p) => p.criteria["gender"] === "Female");
+  const males = people.filter((p) => p.criteria["gender"] === "Male");
+
+  teams[0].members = females;
+  teams[1].members = males;
+  teams[0].metrics = computeMetrics(females, criteria, ["gender"]);
+  teams[1].metrics = computeMetrics(males, criteria, ["gender"]);
+
+  const quality = computeQuality(teams, ["gender"], criteria);
+  // Perfectly unbalanced → score should be 0 (or very low)
+  assertEquals(quality.criteria[0].score < 0.1, true);
+});
+
+Deno.test("computeQuality – all members share single value: worstMAD == bestMAD → score 1", () => {
+  // everyone is "female", so there's no variance possible → range = 0 → score = 1
+  const people: Person[] = Array.from({ length: 8 }, (_, i) => createTestPerson({ displayName: `P${i}`, criteria: { gender: "female" } }));
+  const criteria: CriteriaField[] = [{ key: "gender", label: "Gender", values: ["female"] }];
+  const teams = scramble(people, criteria, { mode: "teamCount", teamCount: 2, teamSize: 4, balanceCriteria: ["gender"] });
+  const quality = computeQuality(teams, ["gender"], criteria);
+  assertEquals(quality.criteria[0].score, 1);
+  // count < numTeams is false (8 >= 2), so limited should be false
+  assertEquals(quality.criteria[0].limited, false);
+});
+
+Deno.test("computeQuality – empty teams list returns overall 1 with empty criteria", () => {
+  const criteria: CriteriaField[] = [{ key: "gender", label: "Gender", values: [] }];
+  const quality = computeQuality([], ["gender"], criteria);
+  assertEquals(quality.overall, 1);
+  assertEquals(quality.criteria, []);
+});
+
+Deno.test("computeQuality – teams with 0 members do not cause division errors", () => {
+  // Create a team with 0 members (simulates post-move state)
+  const members = Array.from({ length: 4 }, (_, i) => createTestPerson({ displayName: `P${i}`, criteria: { gender: i % 2 === 0 ? "female" : "male" } }));
+  const criteria: CriteriaField[] = [{ key: "gender", label: "Gender", values: ["female", "male"] }];
+  const emptyTeam = { id: "t0", name: "Empty", emoji: "🔥", members: [], metrics: [] };
+  const fullTeam = {
+    id: "t1",
+    name: "Full",
+    emoji: "🌊",
+    members,
+    metrics: [{ key: "gender", label: "Gender", counts: { female: 2, male: 2 }, ratios: { female: 0.5, male: 0.5 } }],
+  };
+  const quality = computeQuality([emptyTeam, fullTeam], ["gender"], criteria);
+  // Should compute without throwing
+  assertEquals(quality.overall >= 0 && quality.overall <= 1, true);
+});
+
+Deno.test("computeQuality – limited is false when count equals numTeams (borderline, not fewer)", () => {
+  // Exactly 4 of each value across 4 teams → count >= numTeams → limited = false
+  const people: Person[] = Array.from({ length: 8 }, (_, i) => createTestPerson({ displayName: `P${i}`, criteria: { gender: i < 4 ? "female" : "male" } }));
+  const criteria: CriteriaField[] = [{ key: "gender", label: "Gender", values: ["female", "male"] }];
+  const teams = scramble(people, criteria, { mode: "teamCount", teamCount: 4, teamSize: 2, balanceCriteria: ["gender"] });
+  const quality = computeQuality(teams, ["gender"], criteria);
+  assertEquals(quality.criteria[0].limited, false);
 });

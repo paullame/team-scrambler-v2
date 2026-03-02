@@ -162,3 +162,103 @@ Deno.test("parseCSV – strips surrounding whitespace from values", () => {
   const gender = criteria.find((c) => c.key === "gender")!;
   assertEquals(gender.values, ["female", "male"]);
 });
+
+// ---------------------------------------------------------------------------
+// toLabel – camelCase and multi-word header conversion
+// ---------------------------------------------------------------------------
+
+Deno.test("toLabel – single lowercase word capitalised", () => {
+  // "gender" → "Gender"
+  const { criteria } = parseCSV(`firstName,gender\nAlice,female`);
+  const g = criteria.find((c) => c.key === "gender")!;
+  assertEquals(g.label, "Gender");
+});
+
+Deno.test("toLabel – camelCase split into title-cased words", () => {
+  // "entityName" → "Entity Name"
+  const { criteria } = parseCSV(`firstName,entityName\nAlice,MKT`);
+  const c = criteria.find((c) => c.key === "entityName")!;
+  assertEquals(c.label, "Entity Name");
+});
+
+Deno.test("toLabel – multi-word camelCase: managementCommittee → Management Committee", () => {
+  const { criteria } = parseCSV(`firstName,managementCommittee\nAlice,true`);
+  const c = criteria.find((c) => c.key === "managementCommittee")!;
+  assertEquals(c.label, "Management Committee");
+});
+
+Deno.test("toLabel – already title-cased header is not double-spaced", () => {
+  // "Gender" → "Gender" (single capital letter at start should not produce " Gender")
+  const { criteria } = parseCSV(`firstName,Gender\nAlice,female`);
+  const c = criteria.find((c) => c.key === "Gender")!;
+  assertEquals(c.label, "Gender");
+});
+
+// ---------------------------------------------------------------------------
+// displayName – name / fullName column branches
+// ---------------------------------------------------------------------------
+
+Deno.test("displayName – uses 'name' column (priority 3)", () => {
+  const csv = `name,gender\nJohn Doe,male\nJane Doe,female`;
+  const { people } = parseCSV(csv);
+  assertEquals(people[0].displayName, "John Doe");
+  assertEquals(people[1].displayName, "Jane Doe");
+});
+
+Deno.test("displayName – uses 'fullName' column when no firstName/lastName/displayName", () => {
+  const csv = `fullName,gender\nJohn Smith,male\nJane Smith,female`;
+  const { people } = parseCSV(csv);
+  assertEquals(people[0].displayName, "John Smith");
+  assertEquals(people[1].displayName, "Jane Smith");
+});
+
+Deno.test("displayName – only firstName present (no lastName)", () => {
+  const csv = `firstName,gender\nAlice,female\nBob,male`;
+  const { people } = parseCSV(csv);
+  assertEquals(people[0].displayName, "Alice");
+  assertEquals(people[1].displayName, "Bob");
+});
+
+Deno.test("displayName – only lastName present (no firstName)", () => {
+  const csv = `lastName,gender\nDupont,female\nMartin,male`;
+  const { people } = parseCSV(csv);
+  assertEquals(people[0].displayName, "Dupont");
+  assertEquals(people[1].displayName, "Martin");
+});
+
+Deno.test("displayName – displayName takes priority over name column", () => {
+  const csv = `displayName,name,gender\nAlias Name,Full Name,female`;
+  const { people } = parseCSV(csv);
+  assertEquals(people[0].displayName, "Alias Name");
+});
+
+// ---------------------------------------------------------------------------
+// Quoted values and embedded commas
+// ---------------------------------------------------------------------------
+
+Deno.test("parseCSV – quoted values containing commas are parsed as single value", () => {
+  // RFC 4180 quoting: "Smith, Jr." is a single field despite the comma
+  const csv = `firstName,lastName,gender\nJohn,"Smith, Jr.",male`;
+  const { people } = parseCSV(csv);
+  assertEquals(people[0].displayName, "John Smith, Jr.");
+});
+
+Deno.test("parseCSV – double-quoted value with embedded quote preserved", () => {
+  // RFC 4180: "" inside a quoted field represents a literal "
+  const csv = `firstName,note\nBob,"Say ""hello"""\n`;
+  const { people } = parseCSV(csv);
+  assertEquals(people[0].criteria["note"], `Say "hello"`);
+});
+
+// ---------------------------------------------------------------------------
+// Blank data rows
+// ---------------------------------------------------------------------------
+
+Deno.test("parseCSV – blank row produces Person with fallback displayName", () => {
+  // A row that has no name value should fall back to "Person N"
+  const csv = `firstName,gender\n,female\nAlice,male`;
+  const { people } = parseCSV(csv);
+  // First row has no firstName → fallback "Person 1"
+  assertMatch(people[0].displayName, /^Person \d+$/);
+  assertEquals(people[1].displayName, "Alice");
+});
