@@ -1,5 +1,11 @@
 {
-  "name": "App",
+  "name": "Team Scrambler",
+  "short_name": "Scrambler",
+  "description": "Distribute people into balanced teams based on configurable criteria. Upload a CSV, pick your settings, get fair teams instantly.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "icons": [
     {
       "src": "\/android-icon-36x36.png",
