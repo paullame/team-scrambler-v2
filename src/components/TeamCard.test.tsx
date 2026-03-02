@@ -115,7 +115,7 @@ describe("TeamCard", () => {
     render(
       <div>
         <TeamCard {...makeProps({ onRename })} />
-        <button>Other</button>
+        <button type="button">Other</button>
       </div>,
     );
     await userEvent.click(screen.getByText("Team Alpha"));
