@@ -48,20 +48,31 @@
 
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "Team Scrambler",
-        "url": "https://team-scrambler-v2.paularoid.deno.net/",
-        "description": "Team Scrambler is a free tool to distribute people into balanced teams based on configurable criteria such as gender, entity affiliation, and management tier.",
-        "applicationCategory": "UtilityApplication",
-        "operatingSystem": "Any",
-        "offers": {
-          "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "USD"
-        }
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Team Scrambler",
+      "url": "https://team-scrambler-v2.paularoid.deno.net/",
+      "description": "Team Scrambler is a free tool to distribute people into balanced teams based on configurable criteria such as gender, entity affiliation, and management tier.",
+      "applicationCategory": "UtilityApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
       }
+    }
+    </script>
+    <!-- Privacy-friendly analytics by Plausible -->
+    <script async src="https://plausible.io/js/pa-Ecsq0mR9pN5NABaMSL-RF.js"></script>
+    <script>
+      window.plausible = window.plausible || function () {
+        (plausible.q = plausible.q || []).push(arguments);
+      },
+        plausible.init = plausible.init || function (i) {
+          plausible.o = i || {};
+        };
+      plausible.init();
     </script>
 
     <!-- Apply stored theme before first paint to avoid flash -->
