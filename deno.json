@@ -45,7 +45,8 @@
   "fmt": {
     "lineWidth": 160,
     "exclude": [
-      ".github/skills/"
+      ".agents/",
+      "dist/"
     ]
   },
   "lint": {
