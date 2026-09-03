@@ -1,5 +1,6 @@
 import { crypto } from "@std/crypto";
-import type { CriteriaField, Person, Team } from "../types.ts";
+import type { CriteriaField, Person } from "../types.ts";
+import type { Team } from "../scenarios/team-balancing/types.ts";
 
 /**
  * Generate a UUID-like string for testing.

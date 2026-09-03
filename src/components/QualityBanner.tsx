@@ -1,4 +1,4 @@
-import type { ScrambleQuality } from "../types.ts";
+import type { ScrambleQuality } from "../scenarios/team-balancing/types.ts";
 
 interface Props {
   quality: ScrambleQuality;

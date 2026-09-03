@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { TeamCard } from "./TeamCard.tsx";
-import type { Team } from "../types.ts";
+import type { Team } from "../scenarios/team-balancing/types.ts";
 
 // ---------------------------------------------------------------------------
 // Fixtures
@@ -16,7 +16,15 @@ function makeTeam(overrides: Partial<Team> = {}): Team {
 }
 
 function makeProps(overrides: Partial<React.ComponentProps<typeof TeamCard>> = {}) {
-  return { team: makeTeam(), index: 0, onRename: vi.fn(), onMoveMember: vi.fn(), onCycleEmoji: vi.fn(), ...overrides };
+  return {
+    team: makeTeam(),
+    index: 0,
+    onRename: vi.fn(),
+    onMoveMember: vi.fn(),
+    onCycleEmoji: vi.fn(),
+    availableTeams: [{ id: "team-1", name: "Team Alpha" }],
+    ...overrides,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -170,5 +178,22 @@ describe("TeamCard", () => {
       })
     ).not.toThrow();
     expect(onMoveMember).not.toHaveBeenCalled();
+  });
+
+  it("offers a keyboard and touch friendly move control", async () => {
+    const onMoveMember = vi.fn();
+    render(
+      <TeamCard
+        {...makeProps({
+          onMoveMember,
+          availableTeams: [
+            { id: "team-1", name: "Team Alpha" },
+            { id: "team-2", name: "Team Beta" },
+          ],
+        })}
+      />,
+    );
+    await userEvent.selectOptions(screen.getByRole("combobox", { name: "Move Alice to another team" }), "team-2");
+    expect(onMoveMember).toHaveBeenCalledWith("p-alice", "team-1", "team-2");
   });
 });

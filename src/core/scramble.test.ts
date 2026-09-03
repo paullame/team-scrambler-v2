@@ -1,6 +1,7 @@
 import { assertEquals, assertGreater, assertLessOrEqual } from "@std/assert";
 import { computeMetrics, scramble, TEAM_EMOJIS } from "./scramble.ts";
-import type { CriteriaField, Person, ScramblerConfig, Team } from "../types.ts";
+import type { CriteriaField, Person } from "../types.ts";
+import type { ScramblerConfig, Team } from "../scenarios/team-balancing/types.ts";
 import { createTestTeam } from "./testHelpers.ts";
 
 // ---------------------------------------------------------------------------
@@ -255,16 +256,13 @@ Deno.test("scramble – total gender counts preserved after scramble", () => {
 });
 
 // ---------------------------------------------------------------------------
-// Randomness
+// Deterministic randomness
 // ---------------------------------------------------------------------------
 
-Deno.test("scramble – two calls produce different orderings (probabilistic)", () => {
-  const r1 = scramble(PEOPLE, CRITERIA, makeConfig({ teamCount: 4 }));
-  const r2 = scramble(PEOPLE, CRITERIA, makeConfig({ teamCount: 4 }));
-  const names1 = r1.flatMap((t) => t.members.map((p) => p.displayName)).join(",");
-  const names2 = r2.flatMap((t) => t.members.map((p) => p.displayName)).join(",");
-  // With 20 people this collision probability is astronomically small.
-  assertEquals(names1 === names2, false);
+Deno.test("scramble – the same seed reproduces the same result", () => {
+  const r1 = scramble(PEOPLE, CRITERIA, makeConfig({ teamCount: 4 }), 1234);
+  const r2 = scramble(PEOPLE, CRITERIA, makeConfig({ teamCount: 4 }), 1234);
+  assertEquals(r1, r2);
 });
 
 // ---------------------------------------------------------------------------

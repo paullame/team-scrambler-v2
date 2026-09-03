@@ -19,15 +19,14 @@ jobs:
 
       - name: Setup Deno
         uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
 
       - name: Install dependencies
-        run: deno install
+        run: deno install --frozen
 
-      - name: Verify formatting
-        run: deno fmt --check
+      - name: Install browser
+        run: deno run -A npm:playwright@1.62.1 install --with-deps chromium
 
-      - name: Run linter
-        run: deno lint
-
-      - name: Run tests
-        run: deno task test
+      - name: Verify project
+        run: deno task ci

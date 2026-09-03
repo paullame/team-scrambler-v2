@@ -6,6 +6,7 @@
 ## Context
 
 Team Scrambler processes user data (CSV files) to generate team assignments. The data flow is:
+
 1. User uploads CSV file
 2. System parses CSV into Individual objects
 3. User may edit individuals in the table
@@ -15,6 +16,7 @@ Team Scrambler processes user data (CSV files) to generate team assignments. The
 7. User exports results as CSV or PNG
 
 The data needs to:
+
 - Be quickly accessible for UI updates
 - Support real-time modifications
 - Be available for export
@@ -27,6 +29,7 @@ Store all application data **in-memory** using React state (useState, useReducer
 ## Consequences
 
 ### Positive
+
 - **Performance**: In-memory access is instantaneous - no network latency, no database queries
 - **Simplicity**: No need for database design, API calls, or state synchronization
 - **Real-time updates**: UI updates immediately as data changes
@@ -35,6 +38,7 @@ Store all application data **in-memory** using React state (useState, useReducer
 - **No backend dependency**: Works with pure client-side architecture (ADR-0004)
 
 ### Negative
+
 - **No persistence**: All data is lost on page refresh or browser close (except theme preference)
 - **Memory limits**: Browser memory constraints limit maximum CSV size
 - **No undo**: Manual team adjustments via drag-and-drop cannot be undone (though this could be added with local state history)
@@ -42,22 +46,25 @@ Store all application data **in-memory** using React state (useState, useReducer
 
 ## Implementation Details
 
-| Data Type | Storage | Location |
-|---|---|---|
-| Individuals | React state | `App.tsx` (useState) |
-| Teams | React state | `App.tsx` (derived from individuals + settings) |
-| Settings | React state | `App.tsx` (useState) |
-| Theme preference | localStorage | Persisted across sessions |
-| CSV parse errors | React state | `CsvDropZone.tsx` |
+| Data Type        | Storage      | Location                                        |
+| ---------------- | ------------ | ----------------------------------------------- |
+| Individuals      | React state  | `App.tsx` (useState)                            |
+| Teams            | React state  | `App.tsx` (derived from individuals + settings) |
+| Settings         | React state  | `App.tsx` (useState)                            |
+| Theme preference | localStorage | Persisted across sessions                       |
+| CSV parse errors | React state  | `CsvDropZone.tsx`                               |
 
 ## Alternatives Considered
 
-1. **localStorage for all data**: Persist everything in browser storage. Rejected because it adds complexity for serialization/deserialization and doesn't provide significant benefit for typical use cases (users don't need to return to their work later).
+1. **localStorage for all data**: Persist everything in browser storage. Rejected because it adds complexity for serialization/deserialization and doesn't
+   provide significant benefit for typical use cases (users don't need to return to their work later).
 
 2. **IndexedDB**: Client-side database for larger data. Rejected as unnecessary - typical CSV files for team scrambling are small enough for in-memory storage.
 
 3. **Server-side persistence**: Store data on server. Rejected because it contradicts the client-side only architecture and adds unnecessary complexity.
 
-4. **URL state**: Encode state in URL hash. Rejected because it would make URLs unmanageably long for typical datasets and doesn't handle binary data (CSV content) well.
+4. **URL state**: Encode state in URL hash. Rejected because it would make URLs unmanageably long for typical datasets and doesn't handle binary data (CSV
+   content) well.
 
-5. **SessionStorage**: Persist for session duration. Rejected because the benefit over in-memory is marginal (tab refresh would restore, but full browser restart wouldn't) and it requires serialization overhead.
+5. **SessionStorage**: Persist for session duration. Rejected because the benefit over in-memory is marginal (tab refresh would restore, but full browser
+   restart wouldn't) and it requires serialization overhead.

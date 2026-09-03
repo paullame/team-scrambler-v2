@@ -1,7 +1,8 @@
 # Scrambling Algorithm
 
-This document describes the two algorithms implemented in [`src/core/scramble.ts`](src/core/scramble.ts): the **assignment algorithm** (`scramble`) that
-distributes people into teams, and the **quality scoring algorithm** (`computeQuality`) that measures how well-balanced the result is.
+This document describes the two algorithms implemented in [`src/scenarios/team-balancing/solver.ts`](../src/scenarios/team-balancing/solver.ts): the
+**assignment algorithm** (`scramble`) that distributes people into teams, and the **quality scoring algorithm** (`computeQuality`) that measures how
+well-balanced the result is.
 
 ---
 
@@ -29,7 +30,7 @@ of criteria independently.
 ### Steps
 
 ```
-1.  Shuffle all people uniformly at random.
+1.  Shuffle all people from an explicit pseudorandom seed.
 2.  Pre-compute global value counts per criterion.
 3.  For each person (in shuffled order):
       For each team i:
@@ -113,15 +114,9 @@ $$
 \text{MAD}_v = \frac{1}{T} \sum_{i=1}^{T} \left| \text{ratio}_{i,v} - R_v \right|
 $$
 
-$$
-\text{bestMAD}_v = \frac{r \cdot \left|\frac{\lfloor c_v/T \rfloor + 1}{\bar{s}} - R_v\right| + (T-r) \cdot \left|\frac{\lfloor c_v/T \rfloor}{\bar{s}} - R_v\right|}{T}
-$$
-
-$$
-\text{worstMAD}_v = \frac{2 \cdot R_v \cdot (T-1)}{T}
-$$
-
-Where $r = c_v \bmod T$ and $\bar{s} = n/T$.
+The best and worst MAD bounds are calculated against the actual team sizes. For each value, a bounded dynamic program considers every integer allocation
+$x_i \in [0, |T_i|]$ where $\sum_i x_i = c_v$. The minimum and maximum of $\frac{1}{T}\sum_i|x_i/|T_i|-R_v|$ give the achievable bounds. This accounts correctly
+for unequal team sizes and capacity constraints.
 
 The per-criterion score:
 
@@ -175,12 +170,12 @@ A simple mean across all active balance criteria.
 **Greedy over exact optimisation.** Exact solutions (ILP, Hungarian algorithm) guarantee optimality but are NP-hard in the general multi-criteria case. The
 greedy cost function achieves near-optimal balance in $O(n \cdot T \cdot k)$ time, which is instantaneous even for large datasets.
 
-**Shuffle before greedy.** Without an initial shuffle, the assignment is deterministic and the first people in the CSV always land in team 1. Shuffling first
-ensures different results on each run while the greedy pass preserves balance quality.
+**Seeded shuffle before greedy.** Without an initial shuffle, the first people in the CSV always land in team 1. An explicit seed gives users a fresh result by
+default while making a particular run reproducible for testing and debugging.
 
 **Score normalised to best achievable, not to perfect.** Normalising against the theoretical best (given integer constraints) means the score reflects algorithm
 quality, not data quality. A dataset with one person per entity across 4 teams cannot give a perfect ratio score — that is a data constraint, not an algorithm
 failure. The `limited` flag surfaces this separately.
 
-**Independent per-criterion costs.** Each criterion contributes independently to the assignment cost. This avoids the combinatorial explosion of the previous
+**Per-criterion cost terms.** Each criterion contributes a term to the shared assignment cost. This avoids the combinatorial explosion of the previous
 combined-stratum approach: 3 criteria with 2 values each produce 8 possible strata, most of which have ≤1 member, collapsing the balance guarantee.

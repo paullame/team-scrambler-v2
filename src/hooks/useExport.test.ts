@@ -1,35 +1,10 @@
 import { assertEquals } from "@std/assert";
 import { createBalancedTestPopulation, createTestCriteriaField, createTestPerson, createTestTeam } from "../core/testHelpers.ts";
-import type { CriteriaField, Team } from "../types.ts";
+import { createTeamsCsv } from "../core/csvExport.ts";
 
 // ---------------------------------------------------------------------------
 // CSV Export Tests
 // ---------------------------------------------------------------------------
-
-/**
- * Extract the CSV export logic from useExport.
- * In a real test, we'd test the hook itself, but this isolates the
- * CSV formatting logic as a pure function.
- */
-function generateExportCsv(teams: Team[], criteria: CriteriaField[]): string {
-  const criteriaKeys = criteria.map((c) => c.key);
-  const headers = ["name", ...criteriaKeys, "team"];
-
-  const rows = teams.flatMap((team) =>
-    team.members.map((member) => [
-      member.displayName,
-      ...criteriaKeys.map((k) => member.criteria[k] ?? ""),
-      team.name,
-    ])
-  );
-
-  const escape = (s: string) => `"${s.replace(/"/g, '""')}"`;
-  const csv = [headers, ...rows]
-    .map((row) => row.map(escape).join(","))
-    .join("\n");
-
-  return csv;
-}
 
 Deno.test("useExport – CSV: basic export with headers and data", () => {
   const person1 = createTestPerson({
@@ -51,7 +26,7 @@ Deno.test("useExport – CSV: basic export with headers and data", () => {
     createTestCriteriaField({ key: "entity", label: "Entity", values: ["MKT", "OPS"] }),
   ];
 
-  const csv = generateExportCsv([team], criteria);
+  const csv = createTeamsCsv([team], criteria);
 
   // Should contain header
   assertEquals(csv.includes('"name","gender","entity","team"'), true);
@@ -77,7 +52,7 @@ Deno.test("useExport – CSV: escapes quotes in names correctly", () => {
     createTestCriteriaField({ key: "entity", label: "Entity", values: ["IT"] }),
   ];
 
-  const csv = generateExportCsv([team], criteria);
+  const csv = createTeamsCsv([team], criteria);
 
   // Quotes should be doubled: "Johnny" becomes ""Johnny""
   assertEquals(csv.includes('"John ""Johnny"" Doe"'), true);
@@ -100,7 +75,7 @@ Deno.test("useExport – CSV: handles missing criteria values", () => {
     createTestCriteriaField({ key: "entity", label: "Entity", values: [] }),
   ];
 
-  const csv = generateExportCsv([team], criteria);
+  const csv = createTeamsCsv([team], criteria);
 
   // Missing value should be empty in CSV
   const lines = csv.split("\n");
@@ -122,7 +97,7 @@ Deno.test("useExport – CSV: multiple teams with correct distribution", () => {
     members: [person3],
   });
 
-  const csv = generateExportCsv([team1, team2], []);
+  const csv = createTeamsCsv([team1, team2], []);
 
   // All people should be present
   assertEquals(csv.includes('"Alice"'), true);
@@ -151,7 +126,7 @@ Deno.test("useExport – CSV: column order matches (name, criteria..., team)", (
     createTestCriteriaField({ key: "dept", label: "Department", values: [] }),
   ];
 
-  const csv = generateExportCsv([team], criteria);
+  const csv = createTeamsCsv([team], criteria);
   const lines = csv.split("\n");
   const header = lines[0];
 
@@ -165,7 +140,7 @@ Deno.test("useExport – CSV: empty teams list produces header only", () => {
     createTestCriteriaField({ key: "gender", label: "Gender", values: [] }),
   ];
 
-  const csv = generateExportCsv([], criteria);
+  const csv = createTeamsCsv([], criteria);
   const lines = csv.split("\n");
 
   // Should have header with no data rows
@@ -188,7 +163,7 @@ Deno.test("useExport – CSV: special characters in names handled correctly", ()
     createTestCriteriaField({ key: "entity", label: "Entity", values: [] }),
   ];
 
-  const csv = generateExportCsv([team], criteria);
+  const csv = createTeamsCsv([team], criteria);
 
   // Special chars should be preserved
   assertEquals(csv.includes("José García, Jr."), true);
@@ -206,7 +181,7 @@ Deno.test("useExport – CSV: balanced population export", () => {
     members: people.slice(4, 8),
   });
 
-  const csv = generateExportCsv([team1, team2], criteria);
+  const csv = createTeamsCsv([team1, team2], criteria);
   const lines = csv.split("\n");
 
   // Header + 8 people
@@ -215,4 +190,14 @@ Deno.test("useExport – CSV: balanced population export", () => {
   // All criteria should be in header
   assertEquals(csv.includes('"gender"'), true);
   assertEquals(csv.includes('"entity"'), true);
+});
+
+Deno.test("useExport – CSV: neutralizes spreadsheet formulas", () => {
+  const person = createTestPerson({ displayName: '=HYPERLINK("https://example.test")', criteria: { note: "+1" } });
+  const team = createTestTeam({ name: "@command", members: [person] });
+  const criteria = [createTestCriteriaField({ key: "note", label: "Note", values: [] })];
+  const csv = createTeamsCsv([team], criteria);
+  assertEquals(csv.includes("'=HYPERLINK"), true);
+  assertEquals(csv.includes("'+1"), true);
+  assertEquals(csv.includes("'@command"), true);
 });

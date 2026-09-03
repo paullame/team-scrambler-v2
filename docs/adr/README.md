@@ -19,14 +19,15 @@ All ADRs follow this naming convention: `NNNN-title-in-kebab-case.md` where NNNN
 
 ## List of ADRs
 
-| Number | Title | Status | Date |
-|---|---|---|---|
-| [0001](0001-use-react-for-ui.md) | Use React for UI | Accepted | 2025-02-21 |
-| [0002](0002-use-deno-as-runtime.md) | Use Deno as Runtime | Accepted | 2025-02-21 |
-| [0003](0003-use-vite-for-building.md) | Use Vite for Building | Accepted | 2025-02-21 |
-| [0004](0004-client-side-only-architecture.md) | Client-Side Only Architecture | Accepted | 2025-02-21 |
-| [0005](0005-use-tailwind-css-for-styling.md) | Use Tailwind CSS for Styling | Accepted | 2025-02-21 |
-| [0006](0006-in-memory-data-processing.md) | In-Memory Data Processing | Accepted | 2025-02-21 |
+| Number                                                 | Title                                  | Status   | Date       |
+| ------------------------------------------------------ | -------------------------------------- | -------- | ---------- |
+| [0001](0001-use-react-for-ui.md)                       | Use React for UI                       | Accepted | 2025-02-21 |
+| [0002](0002-use-deno-as-runtime.md)                    | Use Deno as Runtime                    | Accepted | 2025-02-21 |
+| [0003](0003-use-vite-for-building.md)                  | Use Vite for Building                  | Accepted | 2025-02-21 |
+| [0004](0004-client-side-only-architecture.md)          | Client-Side Only Architecture          | Accepted | 2025-02-21 |
+| [0005](0005-use-tailwind-css-for-styling.md)           | Use Tailwind CSS for Styling           | Accepted | 2025-02-21 |
+| [0006](0006-in-memory-data-processing.md)              | In-Memory Data Processing              | Accepted | 2025-02-21 |
+| [0007](0007-scenario-boundaries-and-seeded-results.md) | Scenario Boundaries and Seeded Results | Accepted | 2026-09-03 |
 
 ## How to Add a New ADR
 
@@ -54,9 +55,11 @@ All ADRs follow this naming convention: `NNNN-title-in-kebab-case.md` where NNNN
 ## Consequences
 
 ### Positive
+
 - [Benefits of this decision]
 
 ### Negative
+
 - [Trade-offs and drawbacks]
 
 ## Alternatives Considered

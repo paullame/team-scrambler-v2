@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import type { Team } from "../types.ts";
+import { useEffect, useRef, useState } from "react";
+import type { Team } from "../scenarios/team-balancing/types.ts";
 
 interface TeamCardProps {
   team: Team;
@@ -7,19 +7,26 @@ interface TeamCardProps {
   onRename: (teamId: string, name: string) => void;
   onMoveMember: (memberId: string, fromTeamId: string, toTeamId: string) => void;
   onCycleEmoji: (teamId: string) => void;
+  availableTeams: Array<{ id: string; name: string }>;
 }
 
-export function TeamCard({ team, index, onRename, onMoveMember, onCycleEmoji }: TeamCardProps) {
+export function TeamCard({ team, index, onRename, onMoveMember, onCycleEmoji, availableTeams }: TeamCardProps) {
   const [editingName, setEditingName] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const isEditing = editingName !== null;
+
+  useEffect(() => {
+    if (isEditing) {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    }
+  }, [isEditing]);
 
   // ── Inline name editing ──────────────────────────────────────────────────
 
   function startEditing() {
     setEditingName(team.name);
-    // Focus deferred so the input is mounted first
-    setTimeout(() => inputRef.current?.select(), 0);
   }
 
   function commitName() {
@@ -106,16 +113,21 @@ export function TeamCard({ team, index, onRename, onMoveMember, onCycleEmoji }: 
                 onChange={(e) => setEditingName(e.target.value)}
                 onBlur={commitName}
                 onKeyDown={handleNameKeyDown}
-                autoFocus
+                aria-label={`Rename ${team.name}`}
+                name={`team-name-${team.id}`}
+                autoComplete="off"
               />
             )
             : (
-              <h2
-                className="card-title text-base cursor-pointer hover:underline hover:decoration-dotted"
-                title="Click to rename"
-                onClick={startEditing}
-              >
-                {team.name}
+              <h2 className="card-title text-base min-w-0">
+                <button
+                  type="button"
+                  className="truncate text-start hover:underline hover:decoration-dotted focus-visible:outline-2 focus-visible:outline-offset-2 rounded-sm"
+                  title="Rename team"
+                  onClick={startEditing}
+                >
+                  {team.name}
+                </button>
               </h2>
             )}
 
@@ -134,8 +146,26 @@ export function TeamCard({ team, index, onRename, onMoveMember, onCycleEmoji }: 
               className="flex items-center gap-2 cursor-grab active:cursor-grabbing select-none rounded px-1 hover:bg-base-200 transition-colors"
               title="Drag to move to another team"
             >
-              <span className="size-1.5 rounded-full bg-primary shrink-0" />
-              {p.displayName}
+              <span className="size-1.5 rounded-full bg-primary shrink-0" aria-hidden="true" />
+              <span className="min-w-0 break-words flex-1">{p.displayName}</span>
+              {availableTeams.length > 1 && (
+                <label className="ms-auto">
+                  <span className="sr-only">Move {p.displayName} to another team</span>
+                  <select
+                    className="select select-ghost select-xs"
+                    aria-label={`Move ${p.displayName} to another team`}
+                    value=""
+                    onChange={(event) => {
+                      if (event.target.value) onMoveMember(p.id, team.id, event.target.value);
+                    }}
+                  >
+                    <option value="">Move…</option>
+                    {availableTeams.filter((candidate) => candidate.id !== team.id).map((candidate) => (
+                      <option key={candidate.id} value={candidate.id}>{candidate.name}</option>
+                    ))}
+                  </select>
+                </label>
+              )}
             </li>
           ))}
         </ul>

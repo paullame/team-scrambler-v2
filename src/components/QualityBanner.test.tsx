@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { QualityBanner } from "./QualityBanner.tsx";
-import type { ScrambleQuality } from "../types.ts";
+import type { ScrambleQuality } from "../scenarios/team-balancing/types.ts";
 
 // ---------------------------------------------------------------------------
 // Fixtures

@@ -1,5 +1,6 @@
 import { parse } from "@std/csv";
-import type { CriteriaField, ParsedCSV, Person } from "../types.ts";
+import type { CriteriaField, ParsedCSV, Participant } from "../types.ts";
+import { normalizeCriterionValue } from "./criteria.ts";
 
 /**
  * Column names (lower-cased) that are treated as name fields rather than
@@ -13,6 +14,7 @@ const NAME_COLUMNS = new Set([
   "fullname",
   "email",
 ]);
+const MAX_PARTICIPANTS = 5000;
 
 /**
  * Derives a display name from a CSV row given the available headers.
@@ -62,7 +64,7 @@ function toLabel(key: string): string {
 }
 
 /**
- * Parses a CSV string into a list of `Person` objects and `CriteriaField`
+ * Parses a CSV string into a list of `Participant` objects and `CriteriaField`
  * metadata.
  *
  * @param text - Raw CSV content.
@@ -70,10 +72,15 @@ function toLabel(key: string): string {
  * @throws If the CSV has no rows or no recognisable name column.
  */
 export function parseCSV(text: string): ParsedCSV {
-  const rows = parse(text, { skipFirstRow: true, strip: true }) as Record<
+  const parsedRows = parse(text, { skipFirstRow: true, strip: true }) as Record<
     string,
     string
   >[];
+  const rows = parsedRows.filter((row) => Object.values(row).some((value) => value.trim().length > 0));
+
+  if (rows.length > MAX_PARTICIPANTS) {
+    throw new Error(`CSV contains ${rows.length} rows. Reduce it to ${MAX_PARTICIPANTS} participants or fewer and try again.`);
+  }
 
   if (rows.length === 0) {
     return { people: [], criteria: [] };
@@ -96,18 +103,21 @@ export function parseCSV(text: string): ParsedCSV {
   }
 
   // Collect unique values per criterion as we iterate rows.
-  const valuesMap = new Map<string, Set<string>>(
-    criteriaKeys.map((k) => [k, new Set<string>()]),
+  const valuesMap = new Map<string, Map<string, string>>(
+    criteriaKeys.map((key) => [key, new Map<string, string>()]),
   );
 
-  const people: Person[] = rows.map((row, i) => {
+  const people: Participant[] = rows.map((row, i) => {
     const displayName = resolveDisplayName(row, headers, `Person ${i + 1}`);
 
     const criteria: Record<string, string> = {};
     for (const key of criteriaKeys) {
       const value = row[key]?.trim() ?? "";
       criteria[key] = value;
-      if (value) valuesMap.get(key)!.add(value);
+      if (value) {
+        const canonicalValue = normalizeCriterionValue(value);
+        if (!valuesMap.get(key)!.has(canonicalValue)) valuesMap.get(key)!.set(canonicalValue, value);
+      }
     }
 
     return {
@@ -120,7 +130,7 @@ export function parseCSV(text: string): ParsedCSV {
   const criteria: CriteriaField[] = criteriaKeys.map((key) => ({
     key,
     label: toLabel(key),
-    values: Array.from(valuesMap.get(key)!).sort(),
+    values: Array.from(valuesMap.get(key)!.values()).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" })),
   }));
 
   return { people, criteria };
