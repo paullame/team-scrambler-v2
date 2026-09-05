@@ -1,7 +1,8 @@
 import { assertEquals, assertGreater, assertLess } from "@std/assert";
 import { computeMetrics, computeQuality, scramble } from "./scramble.ts";
 import { createBalancedTestPopulation, createTestPerson } from "./testHelpers.ts";
-import type { CriteriaField, Person, ScramblerConfig } from "../types.ts";
+import type { CriteriaField, Person } from "../types.ts";
+import type { ScramblerConfig, Team } from "../scenarios/team-balancing/types.ts";
 
 // ---------------------------------------------------------------------------
 // Quality Scoring Edge Cases Tests
@@ -410,4 +411,47 @@ Deno.test("computeQuality – limited is false when count equals numTeams (borde
   const teams = scramble(people, criteria, { mode: "teamCount", teamCount: 4, teamSize: 2, balanceCriteria: ["gender"] });
   const quality = computeQuality(teams, ["gender"], criteria);
   assertEquals(quality.criteria[0].limited, false);
+});
+
+Deno.test("computeQuality – best achievable result with unequal team sizes scores 1", () => {
+  const criteria = [{ key: "group", label: "Group", values: ["A", "B"] }];
+  const teams: Team[] = [
+    {
+      id: "t1",
+      name: "Team 1",
+      emoji: "",
+      members: [
+        createTestPerson({ criteria: { group: "A" } }),
+        createTestPerson({ criteria: { group: "B" } }),
+        createTestPerson({ criteria: { group: "B" } }),
+      ],
+      metrics: [],
+    },
+    {
+      id: "t2",
+      name: "Team 2",
+      emoji: "",
+      members: [
+        createTestPerson({ criteria: { group: "A" } }),
+        createTestPerson({ criteria: { group: "B" } }),
+      ],
+      metrics: [],
+    },
+  ];
+  for (const team of teams) team.metrics = computeMetrics(team.members, criteria, ["group"]);
+  assertEquals(computeQuality(teams, ["group"], criteria).overall, 1);
+});
+
+Deno.test("computeQuality – case variants are one categorical value", () => {
+  const criteria = [{ key: "group", label: "Group", values: ["A", "B"] }];
+  const people = [
+    createTestPerson({ criteria: { group: "A" } }),
+    createTestPerson({ criteria: { group: "a" } }),
+    createTestPerson({ criteria: { group: "B" } }),
+    createTestPerson({ criteria: { group: "b" } }),
+  ];
+  const teams = scramble(people, criteria, { mode: "teamCount", teamCount: 2, teamSize: 2, balanceCriteria: ["group"] }, 7);
+  const quality = computeQuality(teams, ["group"], criteria);
+  assertEquals(quality.criteria[0].mode, "ratio");
+  assertEquals(teams.flatMap((team) => Object.keys(team.metrics[0].counts)).every((value) => value === "A" || value === "B"), true);
 });

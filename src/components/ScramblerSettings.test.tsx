@@ -2,7 +2,8 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { ScramblerSettings } from "./ScramblerSettings.tsx";
-import type { CriteriaField, ScramblerConfig } from "../types.ts";
+import type { CriteriaField } from "../types.ts";
+import type { ScramblerConfig } from "../scenarios/team-balancing/types.ts";
 
 // ---------------------------------------------------------------------------
 // Fixtures

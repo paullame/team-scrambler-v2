@@ -54,8 +54,9 @@ flowchart TB
         subgraph SPA["Single-Page Application"]
             direction TB
             UI["React UI\nTypeScript + Tailwind"]
-            Core["Core Logic\nTypeScript"]
-            State["React State\nuseState/useReducer"]
+            Scenarios["Scenario Modules\nTyped validation + solvers"]
+            Core["Shared Core Logic\nCSV + normalization + export"]
+            State["React State\nInputs + immutable result run"]
         end
         
         Server["Deno Server\nStatic File Server"]
@@ -76,7 +77,8 @@ flowchart TB
     SPA -->|persists preferences| Storage
     
     UI -->|uses| State
-    UI -->|calls| Core
+    UI -->|calls| Scenarios
+    Scenarios -->|uses| Core
     
     style Containers fill:#bbf,stroke:#333
     style External fill:#9f9,stroke:#333
@@ -110,13 +112,15 @@ flowchart TB
     
     subgraph Core["Core Logic"]
         direction TB
-        CsvParser["csvParser.ts\nCSV → Individuals"]
-        Scramble["scramble.ts\nTeam Assignment"]
-        Quality["quality.ts\nBalance Scoring"]
+        CsvParser["csvParser.ts\nCSV → Participants"]
+        Shared["core/\nCSV + normalization + export"]
+        ScenarioRegistry["scenarios/index.ts\nAvailable Scenarios"]
+        TeamBalancing["team-balancing/\nAssignment + Balance Scoring"]
     end
     
     subgraph Types["Data Types"]
-        T["types.ts\nIndividual, Team, Settings"]
+        T["types.ts\nParticipant + Criteria"]
+        ST["scenarios/team-balancing/types.ts\nTeam + Settings + Result"]
     end
 
     App --> Sidebar
@@ -131,14 +135,16 @@ flowchart TB
     
     CsvDropZone --> CsvParser
     PeopleTable --> T
-    ScramblerSettings --> T
+    ScramblerSettings --> ST
     
-    Scramble --> T
-    Scramble --> Quality
-    Quality --> T
+    App --> ScenarioRegistry
+    ScenarioRegistry --> TeamBalancing
+    TeamBalancing --> T
+    TeamBalancing --> ST
+    TeamBalancing --> Shared
     
-    TeamCards --> T
-    QualityBanner --> Quality
+    TeamCards --> ST
+    QualityBanner --> ST
 
     style UI fill:#bbf,stroke:#333
     style Core fill:#bfb,stroke:#333
@@ -147,18 +153,20 @@ flowchart TB
 
 ### Component Responsibilities
 
-| Component             | File                               | Responsibility                                      |
-| --------------------- | ---------------------------------- | --------------------------------------------------- |
-| **App**               | `App.tsx`                          | Root component, state management                    |
-| **CsvDropZone**       | `components/CsvDropZone.tsx`       | Drag-and-drop CSV upload, parse errors              |
-| **PeopleTable**       | `components/PeopleTable.tsx`       | Display, edit, add, delete individuals              |
-| **ScramblerSettings** | `components/ScramblerSettings.tsx` | Team size/count config, balance criteria selection  |
-| **TeamCards**         | `components/TeamCard.tsx`          | Visual team display, drag-and-drop reassign         |
-| **QualityBanner**     | `components/QualityBanner.tsx`     | Balance quality metrics and scoring                 |
-| **csvParser**         | `core/csvParser.ts`                | Parse CSV → Individual objects, auto-detect columns |
-| **scramble**          | `core/scramble.ts`                 | Greedy team assignment algorithm                    |
-| **quality**           | `core/quality.ts`                  | Calculate balance quality scores                    |
-| **types**             | `types.ts`                         | TypeScript interfaces and types                     |
+| Component                   | File                               | Responsibility                                                       |
+| --------------------------- | ---------------------------------- | -------------------------------------------------------------------- |
+| **App**                     | `App.tsx`                          | Root presentation shell                                              |
+| **useAppState**             | `hooks/useAppState.ts`             | Input state and immutable generated-result snapshots                 |
+| **CsvDropZone**             | `components/CsvDropZone.tsx`       | Drag-and-drop CSV upload, parse errors                               |
+| **PeopleTable**             | `components/PeopleTable.tsx`       | Display, edit, add, delete individuals                               |
+| **ScramblerSettings**       | `components/ScramblerSettings.tsx` | Team size/count config, balance criteria selection                   |
+| **TeamCards**               | `components/TeamCard.tsx`          | Visual team display, drag-and-drop reassign                          |
+| **QualityBanner**           | `components/QualityBanner.tsx`     | Balance quality metrics and scoring                                  |
+| **csvParser**               | `core/csvParser.ts`                | Parse CSV → participant objects, auto-detect columns                 |
+| **shared core**             | `core/`                            | CSV parsing, value normalization, and safe CSV export                |
+| **scenario registry**       | `scenarios/index.ts`               | Typed catalog of enabled grouping scenarios                          |
+| **team-balancing scenario** | `scenarios/team-balancing/`        | Validate configuration, generate seeded teams, and calculate quality |
+| **shared types**            | `types.ts`                         | Scenario-neutral participant and criterion types                     |
 
 ---
 
@@ -189,7 +197,7 @@ flowchart TB
         DenoDeploy["Deno Deploy\nServerless"]
     end
 
-    L -->|deno run dev| Vite
+    L -->|deno task dev| Vite
     Vite -->|Hot Reload| L
     
     Deno -->|serveDir| Dist
@@ -205,12 +213,12 @@ flowchart TB
 
 ### Deployment Options
 
-| Environment            | Command          | Hosting                            |
-| ---------------------- | ---------------- | ---------------------------------- |
-| **Development**        | `deno run dev`   | Local Vite server on port 5173     |
-| **Production Build**   | `deno run build` | Generates static files in `/dist`  |
-| **Local Preview**      | `deno run serve` | Deno server on port 8000           |
-| **Production Hosting** | Any static host  | GitHub Pages, Netlify, Deno Deploy |
+| Environment            | Command           | Hosting                            |
+| ---------------------- | ----------------- | ---------------------------------- |
+| **Development**        | `deno task dev`   | Local Vite server on port 5173     |
+| **Production Build**   | `deno task build` | Generates static files in `/dist`  |
+| **Local Preview**      | `deno task serve` | Deno server on port 8000           |
+| **Production Hosting** | Any static host   | GitHub Pages, Netlify, Deno Deploy |
 
 ---
 
@@ -220,13 +228,13 @@ flowchart TB
 flowchart LR
     CSV -->|upload| CsvDropZone
     CsvDropZone -->|parse| CsvParser
-    CsvParser -->|Individual[]| PeopleTable
+    CsvParser -->|Participant[]| PeopleTable
     PeopleTable -->|display| UI
     
-    ScramblerSettings -->|config| Scramble
-    PeopleTable -->|data| Scramble
-    Scramble -->|Team[]| TeamCards
-    Scramble -->|metrics| Quality
+    ScramblerSettings -->|config| TeamScenario[Team-balancing scenario]
+    PeopleTable -->|Participant[]| TeamScenario
+    TeamScenario -->|versioned result snapshot| TeamCards
+    TeamScenario -->|metrics| Quality
     Quality -->|scores| QualityBanner
     
     TeamCards -->|export| PNG
@@ -254,16 +262,16 @@ flowchart LR
 
 ## Architecture Characteristics
 
-| Characteristic         | Description                             |
-| ---------------------- | --------------------------------------- |
-| **Architecture Style** | Single-Page Application (SPA)           |
-| **Deployment Model**   | Static site (can run anywhere)          |
-| **State Management**   | React local state (useState/useReducer) |
-| **Data Storage**       | In-memory (no server persistence)       |
-| **Routing**            | react-router-dom (client-side)          |
-| **Offline Support**    | Yes (once loaded)                       |
-| **Responsiveness**     | Yes (mobile-first design)               |
-| **Theming**            | Light/Dark mode via Tailwind            |
+| Characteristic         | Description                                                 |
+| ---------------------- | ----------------------------------------------------------- |
+| **Architecture Style** | Single-Page Application (SPA)                               |
+| **Deployment Model**   | Static site (can run anywhere)                              |
+| **State Management**   | React input state plus immutable generated-result snapshots |
+| **Data Storage**       | In-memory (no server persistence)                           |
+| **Routing**            | None; the current application has one screen                |
+| **Offline Support**    | Browser cache only; no service worker guarantee             |
+| **Responsiveness**     | Yes (mobile-first design)                                   |
+| **Theming**            | Light/Dark mode via Tailwind                                |
 
 ---
 

@@ -2,7 +2,7 @@ import { assertEquals, assertThrows } from "@std/assert";
 import { parseCSV } from "../core/csvParser.ts";
 import { computeQuality, scramble } from "../core/scramble.ts";
 import { createBalancedTestPopulation, createTestCriteriaField, createTestPerson } from "../core/testHelpers.ts";
-import type { ScramblerConfig } from "../types.ts";
+import type { ScramblerConfig } from "../scenarios/team-balancing/types.ts";
 
 // ---------------------------------------------------------------------------
 // Tests simulating useAppState orchestration

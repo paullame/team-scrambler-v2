@@ -1,7 +1,7 @@
 import { useState } from "react";
-import type { CriteriaField, Person } from "../types.ts";
+import type { CriteriaField, Participant } from "../types.ts";
 
-function blankPerson(criteria: CriteriaField[]): Person {
+function blankParticipant(criteria: CriteriaField[]): Participant {
   return {
     id: crypto.randomUUID(),
     displayName: "",
@@ -15,18 +15,18 @@ function blankPerson(criteria: CriteriaField[]): Person {
  * operation succeeds.
  */
 export function useTableEdit(
-  people: Person[],
+  people: Participant[],
   criteria: CriteriaField[],
-  onChange: (people: Person[]) => void,
+  onChange: (people: Participant[]) => void,
 ) {
   const [editId, setEditId] = useState<string | null>(null);
-  const [editDraft, setEditDraft] = useState<Person | null>(null);
+  const [editDraft, setEditDraft] = useState<Participant | null>(null);
   const [addingRow, setAddingRow] = useState(false);
-  const [newDraft, setNewDraft] = useState<Person>(() => blankPerson(criteria));
+  const [newDraft, setNewDraft] = useState<Participant>(() => blankParticipant(criteria));
 
   // ── Edit ──────────────────────────────────────────────────────────────
 
-  function startEdit(person: Person) {
+  function startEdit(person: Participant) {
     setEditId(person.id);
     setEditDraft(structuredClone(person));
   }
@@ -56,7 +56,7 @@ export function useTableEdit(
   // ── Add ───────────────────────────────────────────────────────────────
 
   function startAdd() {
-    setNewDraft(blankPerson(criteria));
+    setNewDraft(blankParticipant(criteria));
     setAddingRow(true);
   }
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { CriteriaField, Person } from "../types.ts";
+import type { CriteriaField, Participant } from "../types.ts";
 
 type SortDir = "asc" | "desc";
 
@@ -8,7 +8,7 @@ type SortDir = "asc" | "desc";
  * Returns a stable-sorted copy of `people` plus the controls needed to
  * drive the sortable column headers.
  */
-export function useTableSort(people: Person[], _criteria: CriteriaField[]) {
+export function useTableSort(people: Participant[], _criteria: CriteriaField[]) {
   const [sortKey, setSortKey] = useState<string>("displayName");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
 

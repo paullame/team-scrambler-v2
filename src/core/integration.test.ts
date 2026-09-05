@@ -1,7 +1,7 @@
 import { assertEquals } from "@std/assert";
 import { parseCSV } from "../core/csvParser.ts";
 import { computeQuality, scramble } from "../core/scramble.ts";
-import type { ScramblerConfig } from "../types.ts";
+import type { ScramblerConfig } from "../scenarios/team-balancing/types.ts";
 
 // ---------------------------------------------------------------------------
 // Integration Tests: End-to-End Workflows
@@ -197,7 +197,7 @@ Bob,B,M`;
   assertEquals(parsed.people.length, 2);
 });
 
-Deno.test("Integration – Re-scrambling same data produces different teams", () => {
+Deno.test("Integration – seed makes scrambling reproducible", () => {
   const csvData = `firstName,lastName,gender
 Person1,L1,F
 Person2,L2,M
@@ -212,25 +212,9 @@ Person4,L4,M`;
     balanceCriteria: [],
   };
 
-  // Scramble twice
-  const teams1 = scramble(parsed.people, parsed.criteria, config);
-  const teams2 = scramble(parsed.people, parsed.criteria, config);
-
-  // Unlikely to be identical due to randomness (could happen with tiny probability)
-  // Check if they're different by comparing member order
-  let different = false;
-  for (let i = 0; i < teams1.length; i++) {
-    const ids1 = teams1[i].members.map((m) => m.id).join(",");
-    const ids2 = teams2[i].members.map((m) => m.id).join(",");
-    if (ids1 !== ids2) {
-      different = true;
-      break;
-    }
-  }
-
-  // In practice, due to the randomized nature, they should differ
-  // If they happen to be the same, the test still passes (probability << 1%)
-  assertEquals(true, true);
+  const teams1 = scramble(parsed.people, parsed.criteria, config, 42);
+  const teams2 = scramble(parsed.people, parsed.criteria, config, 42);
+  assertEquals(teams1, teams2);
 });
 
 Deno.test("Integration – Team name changes persist through operations", () => {

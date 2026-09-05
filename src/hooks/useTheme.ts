@@ -23,7 +23,11 @@ export function useTheme() {
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem(STORAGE_KEY, theme);
+    try {
+      localStorage.setItem(STORAGE_KEY, theme);
+    } catch {
+      // The visual theme still works when storage is unavailable.
+    }
   }, [theme]);
 
   function toggleTheme() {

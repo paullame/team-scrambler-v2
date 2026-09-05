@@ -1,4 +1,5 @@
-import type { CriteriaField, ScramblerConfig } from "../types.ts";
+import type { CriteriaField } from "../types.ts";
+import type { ScramblerConfig } from "../scenarios/team-balancing/types.ts";
 
 interface Props {
   config: ScramblerConfig;
@@ -22,6 +23,11 @@ export function ScramblerSettings(
     set("balanceCriteria", next);
   }
 
+  function positiveInteger(value: string): number {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? Math.max(1, Math.floor(parsed)) : 1;
+  }
+
   // Derived preview
   const preview: string = (() => {
     if (peopleCount === 0) return "";
@@ -41,27 +47,31 @@ export function ScramblerSettings(
 
         {/* Distribution mode */}
         <div className="flex flex-col gap-3">
-          <span className="text-sm font-medium opacity-70">Distribute by</span>
-          <div className="flex flex-wrap gap-4">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                className="radio radio-sm radio-primary"
-                checked={config.mode === "teamCount"}
-                onChange={() => set("mode", "teamCount")}
-              />
-              <span className="text-sm">Number of teams</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                className="radio radio-sm radio-primary"
-                checked={config.mode === "teamSize"}
-                onChange={() => set("mode", "teamSize")}
-              />
-              <span className="text-sm">Team size</span>
-            </label>
-          </div>
+          <fieldset>
+            <legend className="text-sm font-medium opacity-70 mb-3">Distribute By</legend>
+            <div className="flex flex-wrap gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="distribution-mode"
+                  className="radio radio-sm radio-primary"
+                  checked={config.mode === "teamCount"}
+                  onChange={() => set("mode", "teamCount")}
+                />
+                <span className="text-sm">Number of teams</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="distribution-mode"
+                  className="radio radio-sm radio-primary"
+                  checked={config.mode === "teamSize"}
+                  onChange={() => set("mode", "teamSize")}
+                />
+                <span className="text-sm">Team size</span>
+              </label>
+            </div>
+          </fieldset>
 
           <div className="flex items-center gap-3">
             {config.mode === "teamCount"
@@ -73,11 +83,14 @@ export function ScramblerSettings(
                   <input
                     id="team-count"
                     type="number"
+                    name="team-count"
+                    inputMode="numeric"
+                    autoComplete="off"
                     className="input input-sm input-bordered w-24"
                     min={1}
                     max={peopleCount || 100}
                     value={config.teamCount}
-                    onChange={(e) => set("teamCount", Math.max(1, Number(e.target.value)))}
+                    onChange={(e) => set("teamCount", positiveInteger(e.target.value))}
                   />
                 </>
               )
@@ -89,11 +102,14 @@ export function ScramblerSettings(
                   <input
                     id="team-size"
                     type="number"
+                    name="team-size"
+                    inputMode="numeric"
+                    autoComplete="off"
                     className="input input-sm input-bordered w-24"
                     min={1}
                     max={peopleCount || 100}
                     value={config.teamSize}
-                    onChange={(e) => set("teamSize", Math.max(1, Number(e.target.value)))}
+                    onChange={(e) => set("teamSize", positiveInteger(e.target.value))}
                   />
                 </>
               )}
@@ -104,25 +120,26 @@ export function ScramblerSettings(
         {/* Balance criteria */}
         {criteria.length > 0 && (
           <div className="flex flex-col gap-2">
-            <span className="text-sm font-medium opacity-70">
-              Balance by
-            </span>
-            <div className="flex flex-wrap gap-x-6 gap-y-2">
-              {criteria.map((c) => (
-                <label
-                  key={c.key}
-                  className="flex items-center gap-2 cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    className="checkbox checkbox-sm checkbox-primary"
-                    checked={config.balanceCriteria.includes(c.key)}
-                    onChange={() => toggleCriterion(c.key)}
-                  />
-                  <span className="text-sm">{c.label}</span>
-                </label>
-              ))}
-            </div>
+            <fieldset>
+              <legend className="text-sm font-medium opacity-70 mb-2">Balance By</legend>
+              <div className="flex flex-wrap gap-x-6 gap-y-2">
+                {criteria.map((c) => (
+                  <label
+                    key={c.key}
+                    className="flex items-center gap-2 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      name="balance-criteria"
+                      className="checkbox checkbox-sm checkbox-primary"
+                      checked={config.balanceCriteria.includes(c.key)}
+                      onChange={() => toggleCriterion(c.key)}
+                    />
+                    <span className="text-sm">{c.label}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
           </div>
         )}
       </div>

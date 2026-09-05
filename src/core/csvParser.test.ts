@@ -262,3 +262,15 @@ Deno.test("parseCSV – blank row produces Person with fallback displayName", ()
   assertMatch(people[0].displayName, /^Person \d+$/);
   assertEquals(people[1].displayName, "Alice");
 });
+
+Deno.test("parseCSV – completely blank rows are ignored", () => {
+  const csv = "firstName,gender\nAlice,female\n,\nBob,male\n";
+  const { people } = parseCSV(csv);
+  assertEquals(people.map((person) => person.displayName), ["Alice", "Bob"]);
+});
+
+Deno.test("criteria – values are deduplicated case-insensitively", () => {
+  const csv = "firstName,group\nAlice,Female\nBob,female\n";
+  const { criteria } = parseCSV(csv);
+  assertEquals(criteria[0].values, ["Female"]);
+});

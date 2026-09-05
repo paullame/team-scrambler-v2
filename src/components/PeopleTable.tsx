@@ -1,12 +1,12 @@
 import { Pencil, Plus, Trash2 } from "lucide-react";
-import type { CriteriaField, Person } from "../types.ts";
+import type { CriteriaField, Participant } from "../types.ts";
 import { useTableSort } from "../hooks/useTableSort.ts";
 import { useTableEdit } from "../hooks/useTableEdit.ts";
 
 interface Props {
-  people: Person[];
+  people: Participant[];
   criteria: CriteriaField[];
-  onChange: (people: Person[]) => void;
+  onChange: (people: Participant[]) => void;
 }
 
 export function PeopleTable({ people, criteria, onChange }: Props) {
@@ -28,8 +28,8 @@ export function PeopleTable({ people, criteria, onChange }: Props) {
   } = useTableEdit(people, criteria, onChange);
 
   function sortIcon(key: string) {
-    if (sortKey !== key) return <span className="opacity-20 ml-1">↕</span>;
-    return <span className="ml-1">{sortDir === "asc" ? "↑" : "↓"}</span>;
+    if (sortKey !== key) return <span className="opacity-40 ml-1" aria-hidden="true">↕</span>;
+    return <span className="ml-1" aria-hidden="true">{sortDir === "asc" ? "↑" : "↓"}</span>;
   }
 
   // ── Column definitions ────────────────────────────────────────────────────
@@ -41,12 +41,13 @@ export function PeopleTable({ people, criteria, onChange }: Props) {
 
   // ── Render helpers ────────────────────────────────────────────────────────
 
-  function cellValue(person: Person, key: string) {
+  function cellValue(person: Participant, key: string) {
     return key === "displayName" ? person.displayName : person.criteria[key] ?? "";
   }
 
   function renderInput(
     key: string,
+    label: string,
     value: string,
     onChange: (v: string) => void,
     autoFocus = false,
@@ -58,6 +59,9 @@ export function PeopleTable({ people, criteria, onChange }: Props) {
       <>
         <input
           className="input input-xs input-bordered w-full min-w-20"
+          aria-label={label}
+          name={key}
+          autoComplete="off"
           value={value}
           autoFocus={autoFocus}
           list={listId}
@@ -81,20 +85,30 @@ export function PeopleTable({ people, criteria, onChange }: Props) {
     <div className="flex flex-col gap-3">
       <div className="overflow-x-auto rounded-box border border-base-300">
         <table className="table table-zebra table-sm">
+          <caption className="sr-only">Participants and balancing criteria</caption>
           <thead>
             <tr>
               {columns.map(({ key, label }) => (
                 <th
                   key={key}
-                  className="cursor-pointer select-none whitespace-nowrap"
-                  onClick={() => handleSort(key)}
+                  scope="col"
+                  className="whitespace-nowrap"
+                  aria-sort={sortKey === key ? (sortDir === "asc" ? "ascending" : "descending") : "none"}
                 >
-                  {label}
-                  {sortIcon(key)}
+                  <button
+                    type="button"
+                    className="flex items-center font-semibold hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 rounded-sm"
+                    onClick={() => handleSort(key)}
+                  >
+                    {label}
+                    {sortIcon(key)}
+                  </button>
                 </th>
               ))}
               {/* actions column */}
-              <th />
+              <th scope="col">
+                <span className="sr-only">Actions</span>
+              </th>
             </tr>
           </thead>
 
@@ -102,14 +116,15 @@ export function PeopleTable({ people, criteria, onChange }: Props) {
             {sorted.map((person) => {
               const isEditing = editId === person.id;
               return (
-                <tr key={person.id}>
+                <tr key={person.id} className="content-auto">
                   {isEditing && editDraft
                     ? (
                       <>
-                        {columns.map(({ key }, i) => (
+                        {columns.map(({ key, label }, i) => (
                           <td key={key}>
                             {renderInput(
                               key,
+                              `${label} for ${person.displayName}`,
                               key === "displayName" ? editDraft.displayName : (editDraft.criteria[key] ?? ""),
                               (v) => setDraftField(key, v),
                               i === 0,
@@ -139,7 +154,7 @@ export function PeopleTable({ people, criteria, onChange }: Props) {
                     : (
                       <>
                         {columns.map(({ key }) => (
-                          <td key={key} className={key === "displayName" ? "font-medium" : ""}>
+                          <td key={key} className={`${key === "displayName" ? "font-medium" : ""} break-words max-w-64`}>
                             {cellValue(person, key)}
                           </td>
                         ))}
@@ -151,15 +166,17 @@ export function PeopleTable({ people, criteria, onChange }: Props) {
                               onClick={() => startEdit(person)}
                               aria-label="Edit row"
                             >
-                              <Pencil className="size-3.5" />
+                              <Pencil className="size-3.5" aria-hidden="true" />
                             </button>
                             <button
                               type="button"
                               className="btn btn-xs btn-ghost text-error"
-                              onClick={() => deletePerson(person.id)}
+                              onClick={() => {
+                                if (globalThis.confirm(`Delete ${person.displayName}?`)) deletePerson(person.id);
+                              }}
                               aria-label="Delete row"
                             >
-                              <Trash2 className="size-3.5" />
+                              <Trash2 className="size-3.5" aria-hidden="true" />
                             </button>
                           </div>
                         </td>
@@ -172,10 +189,11 @@ export function PeopleTable({ people, criteria, onChange }: Props) {
             {/* Add new row */}
             {addingRow && (
               <tr className="bg-base-200">
-                {columns.map(({ key }, i) => (
+                {columns.map(({ key, label }, i) => (
                   <td key={key}>
                     {renderInput(
                       key,
+                      `${label} for new participant`,
                       key === "displayName" ? newDraft.displayName : (newDraft.criteria[key] ?? ""),
                       (v) => setNewField(key, v),
                       i === 0,
@@ -203,6 +221,13 @@ export function PeopleTable({ people, criteria, onChange }: Props) {
                 </td>
               </tr>
             )}
+            {people.length === 0 && !addingRow && (
+              <tr>
+                <td colSpan={columns.length + 1} className="text-center opacity-60 py-8">
+                  No participants yet. Add someone or upload a CSV file.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -210,7 +235,7 @@ export function PeopleTable({ people, criteria, onChange }: Props) {
       {!addingRow && (
         <div>
           <button type="button" className="btn btn-sm btn-outline" onClick={startAdd}>
-            <Plus className="size-4" /> Add person
+            <Plus className="size-4" aria-hidden="true" /> Add Person
           </button>
         </div>
       )}

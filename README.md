@@ -7,9 +7,9 @@ for the resulting teams.
 ## Overview
 
 - React with TypeScript on the frontend
-- tailwindcss daisyui for styling
+- Tailwind CSS and daisyUI for styling
 - Vite for the development server
-- deno for typescript runtime
+- Deno for the TypeScript runtime and tooling
 
 ## Getting Started
 
@@ -18,7 +18,7 @@ for the resulting teams.
 To install the dependencies, run the following command:
 
 ```sh
-deno install
+deno install --frozen
 ```
 
 ### Run the dev server with vite
@@ -26,7 +26,7 @@ deno install
 The app uses a Vite dev server to run in development mode. To start the dev server, run the following command:
 
 ```sh
-deno run dev
+deno task dev
 ```
 
 ### Build the app
@@ -34,7 +34,7 @@ deno run dev
 To build the app for production, run the following command:
 
 ```sh
-deno run build
+deno task build
 ```
 
 ### Running Tests
@@ -42,7 +42,7 @@ deno run build
 To run the tests, use the following command:
 
 ```sh
-deno test -A
+deno task test
 ```
 
 ## Features
@@ -53,6 +53,7 @@ deno test -A
 - Automatically detects name columns (`firstName`/`lastName`, `displayName`, `fullName`, `email`) and treats all other columns as balance criteria
 - Loads `example.csv` on first open so the tool is immediately usable
 - Parse error messages are displayed inline
+- Completely blank rows are ignored; imports are limited to 5 MB and 5,000 participants
 
 ### Individuals Table
 
@@ -73,9 +74,9 @@ Greedy assignment with a cost function — $O(n \cdot T \cdot k)$:
 1. Shuffle all people randomly
 2. For each person, assign them to the team with the lowest cost, where cost = team size (size balance) + over-representation penalties per criterion (value
    balance)
-3. Each criterion is optimised independently, so adding more criteria does not degrade balance on others
+3. Each criterion contributes independently to a shared cost function
 
-See [ALGORITHM.md](ALGORITHM.md) for the full technical specification.
+See [the algorithm specification](docs/ALGORITHM.md) for the full technical details.
 
 ### Team Cards
 
@@ -84,6 +85,7 @@ See [ALGORITHM.md](ALGORITHM.md) for the full technical specification.
 - Click a team name to rename it inline
 - Click the emoji to cycle through 20 animal / nature icons
 - Drag a member chip onto another team's card to move them; metrics update immediately
+- A “Move…” control provides the same action for keyboard and touch users
 
 ### Balance Quality Report
 
@@ -111,3 +113,18 @@ Shown after each scramble, above the team cards:
 - Viewport-filling no-scroll layout: sidebar panel + scrollable main area
 - Responsive: sidebar collapses into a slide-in drawer on narrow screens (RTL/LTR-aware via `dir="auto"`)
 - Team cards fade and slide in on first appearance
+
+## Privacy
+
+Participant CSV data and generated teams remain in the browser and are not uploaded to the application server. The page uses Plausible for aggregate usage
+analytics; participant data is not included in those events.
+
+## Quality checks
+
+Run the same checks as CI with:
+
+```sh
+deno task ci
+```
+
+This checks formatting, linting, types, Deno and component tests, the production build, and the Playwright browser workflow.

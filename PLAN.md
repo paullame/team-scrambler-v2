@@ -38,8 +38,8 @@ headers). Settings panel component (`src/components/ScramblerSettings.tsx`).
 
 **Goal**: produce balanced teams.
 
-Pure function `scramble(people, config) → Team[]` in `src/core/scramble.ts`. Stratified shuffle with per-stratum rotating round-robin offset to prevent
-clustering. Diversity metrics per team: raw counts + ratio 0–1 per criterion value. 21 unit tests (all passing).
+Seeded greedy solver in `src/scenarios/team-balancing/solver.ts`. Each criterion contributes an independent cost term while team size remains the primary
+constraint. Diversity metrics expose raw counts and ratios per criterion value.
 
 ## Phase 6 — Layout & Results View [COMPLETE]
 
@@ -107,14 +107,14 @@ each piece unit-testable.
 
 A single `ErrorBoundary` wrapper around `<main>` would prevent a render crash (e.g. a malformed `Team` object after a swap) from blanking the entire UI.
 
-### 6. E2E / integration tests
+### 6. Browser-level E2E tests
 
-All tests today are pure unit tests on `csvParser` and `scramble`. A Playwright smoke test that uploads a CSV, scrambles, and asserts team cards appear would
-catch regressions that unit tests miss.
+Playwright now covers the primary real-browser workflow: CSV upload, scrambling, result focus, keyboard/touch team movement, CSV download, and result
+invalidation after participant edits.
 
 ### 7. Accessibility audit
 
-Basic `aria-label` attributes are in place but no systematic audit has been done. Specific gaps: colour contrast of `opacity-50` text, keyboard navigation
-through team cards, and focus management after the Scramble button fires.
+Semantic tabs, sortable headers, keyboard/touch member movement, live announcements, focus management, and reduced-motion support are in place. Automated
+contrast measurement and real-device verification remain useful release checks.
 
 ---
