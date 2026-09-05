@@ -36,6 +36,7 @@ flowchart TB
 ```
 
 **Stakeholders:**
+
 - **Primary**: Team organizers who upload CSV files and configure team distribution
 - **Secondary**: Team members who view the results
 
@@ -81,11 +82,11 @@ flowchart TB
     style External fill:#9f9,stroke:#333
 ```
 
-| Container | Technology | Responsibility | Persistence |
-|---|---|---|---|
-| **SPA (Client)** | React 19, TypeScript, Tailwind CSS, daisyui | User interface, CSV parsing, team scrambling algorithm | None (in-memory) |
-| **Deno Server** | Deno 2.x, @std/http | Serves static files from `/dist` | None |
-| **Browser Storage** | localStorage | Theme preference | Persistent |
+| Container           | Technology                                  | Responsibility                                         | Persistence      |
+| ------------------- | ------------------------------------------- | ------------------------------------------------------ | ---------------- |
+| **SPA (Client)**    | React 19, TypeScript, Tailwind CSS, daisyui | User interface, CSV parsing, team scrambling algorithm | None (in-memory) |
+| **Deno Server**     | Deno 2.x, @std/http                         | Serves static files from `/dist`                       | None             |
+| **Browser Storage** | localStorage                                | Theme preference                                       | Persistent       |
 
 ---
 
@@ -146,24 +147,25 @@ flowchart TB
 
 ### Component Responsibilities
 
-| Component | File | Responsibility |
-|---|---|---|
-| **App** | `App.tsx` | Root component, state management |
-| **CsvDropZone** | `components/CsvDropZone.tsx` | Drag-and-drop CSV upload, parse errors |
-| **PeopleTable** | `components/PeopleTable.tsx` | Display, edit, add, delete individuals |
-| **ScramblerSettings** | `components/ScramblerSettings.tsx` | Team size/count config, balance criteria selection |
-| **TeamCards** | `components/TeamCard.tsx` | Visual team display, drag-and-drop reassign |
-| **QualityBanner** | `components/QualityBanner.tsx` | Balance quality metrics and scoring |
-| **csvParser** | `core/csvParser.ts` | Parse CSV → Individual objects, auto-detect columns |
-| **scramble** | `core/scramble.ts` | Greedy team assignment algorithm |
-| **quality** | `core/quality.ts` | Calculate balance quality scores |
-| **types** | `types.ts` | TypeScript interfaces and types |
+| Component             | File                               | Responsibility                                      |
+| --------------------- | ---------------------------------- | --------------------------------------------------- |
+| **App**               | `App.tsx`                          | Root component, state management                    |
+| **CsvDropZone**       | `components/CsvDropZone.tsx`       | Drag-and-drop CSV upload, parse errors              |
+| **PeopleTable**       | `components/PeopleTable.tsx`       | Display, edit, add, delete individuals              |
+| **ScramblerSettings** | `components/ScramblerSettings.tsx` | Team size/count config, balance criteria selection  |
+| **TeamCards**         | `components/TeamCard.tsx`          | Visual team display, drag-and-drop reassign         |
+| **QualityBanner**     | `components/QualityBanner.tsx`     | Balance quality metrics and scoring                 |
+| **csvParser**         | `core/csvParser.ts`                | Parse CSV → Individual objects, auto-detect columns |
+| **scramble**          | `core/scramble.ts`                 | Greedy team assignment algorithm                    |
+| **quality**           | `core/quality.ts`                  | Calculate balance quality scores                    |
+| **types**             | `types.ts`                         | TypeScript interfaces and types                     |
 
 ---
 
 ## C4: Code Diagram (Not Applicable)
 
-The C4 model's Code level (class diagrams) is omitted for this project as the component structure is straightforward and the code is well-organized by feature. The TypeScript type system provides sufficient structural documentation.
+The C4 model's Code level (class diagrams) is omitted for this project as the component structure is straightforward and the code is well-organized by feature.
+The TypeScript type system provides sufficient structural documentation.
 
 ---
 
@@ -203,12 +205,12 @@ flowchart TB
 
 ### Deployment Options
 
-| Environment | Command | Hosting |
-|---|---|---|
-| **Development** | `deno run dev` | Local Vite server on port 5173 |
-| **Production Build** | `deno run build` | Generates static files in `/dist` |
-| **Local Preview** | `deno run serve` | Deno server on port 8000 |
-| **Production Hosting** | Any static host | GitHub Pages, Netlify, Deno Deploy |
+| Environment            | Command          | Hosting                            |
+| ---------------------- | ---------------- | ---------------------------------- |
+| **Development**        | `deno run dev`   | Local Vite server on port 5173     |
+| **Production Build**   | `deno run build` | Generates static files in `/dist`  |
+| **Local Preview**      | `deno run serve` | Deno server on port 8000           |
+| **Production Hosting** | Any static host  | GitHub Pages, Netlify, Deno Deploy |
 
 ---
 
@@ -235,33 +237,33 @@ flowchart LR
 
 ## Technology Stack
 
-| Layer | Technology | Version | Purpose |
-|---|---|---|---|
-| **Runtime** | Deno | 2.x | JavaScript/TypeScript runtime |
-| **Framework** | React | 19.2.x | UI component library |
-| **Language** | TypeScript | 5.x | Type-safe JavaScript |
-| **Styling** | Tailwind CSS | 4.3.x | Utility-first CSS |
-| **UI Library** | daisyUI | 5.5.x | Tailwind component library |
-| **Build Tool** | Vite | 8.0.x | Frontend tooling |
-| **Testing** | Vitest | 4.1.x | Component testing |
-| **Testing** | Deno Test | built-in | Core logic testing |
-| **Icons** | Lucide React | 1.18.x | Icon library |
-| **Export** | html-to-image | 1.11.x | PNG export |
+| Layer          | Technology    | Version  | Purpose                       |
+| -------------- | ------------- | -------- | ----------------------------- |
+| **Runtime**    | Deno          | 2.x      | JavaScript/TypeScript runtime |
+| **Framework**  | React         | 19.2.x   | UI component library          |
+| **Language**   | TypeScript    | 5.x      | Type-safe JavaScript          |
+| **Styling**    | Tailwind CSS  | 4.3.x    | Utility-first CSS             |
+| **UI Library** | daisyUI       | 5.5.x    | Tailwind component library    |
+| **Build Tool** | Vite          | 8.0.x    | Frontend tooling              |
+| **Testing**    | Vitest        | 4.1.x    | Component testing             |
+| **Testing**    | Deno Test     | built-in | Core logic testing            |
+| **Icons**      | Lucide React  | 1.18.x   | Icon library                  |
+| **Export**     | html-to-image | 1.11.x   | PNG export                    |
 
 ---
 
 ## Architecture Characteristics
 
-| Characteristic | Description |
-|---|---|
-| **Architecture Style** | Single-Page Application (SPA) |
-| **Deployment Model** | Static site (can run anywhere) |
-| **State Management** | React local state (useState/useReducer) |
-| **Data Storage** | In-memory (no server persistence) |
-| **Routing** | react-router-dom (client-side) |
-| **Offline Support** | Yes (once loaded) |
-| **Responsiveness** | Yes (mobile-first design) |
-| **Theming** | Light/Dark mode via Tailwind |
+| Characteristic         | Description                             |
+| ---------------------- | --------------------------------------- |
+| **Architecture Style** | Single-Page Application (SPA)           |
+| **Deployment Model**   | Static site (can run anywhere)          |
+| **State Management**   | React local state (useState/useReducer) |
+| **Data Storage**       | In-memory (no server persistence)       |
+| **Routing**            | react-router-dom (client-side)          |
+| **Offline Support**    | Yes (once loaded)                       |
+| **Responsiveness**     | Yes (mobile-first design)               |
+| **Theming**            | Light/Dark mode via Tailwind            |
 
 ---
 

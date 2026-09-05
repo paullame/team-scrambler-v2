@@ -6,6 +6,7 @@
 ## Context
 
 Team Scrambler is a web application with a rich, interactive user interface requiring:
+
 - Dynamic rendering of tables, cards, and forms
 - State management for CSV data, team configurations, and results
 - Component reusability (multiple teams, individuals, settings panels)
@@ -13,6 +14,7 @@ Team Scrambler is a web application with a rich, interactive user interface requ
 - Real-time updates when users modify data or settings
 
 The project needed a modern frontend framework that provides:
+
 - A component-based architecture
 - Efficient DOM updates (virtual DOM)
 - A rich ecosystem of libraries and tools
@@ -26,6 +28,7 @@ Use **React 19** with TypeScript as the UI framework.
 ## Consequences
 
 ### Positive
+
 - **Component-based architecture**: Natural fit for the application's modular structure (CsvDropZone, PeopleTable, TeamCards, etc.)
 - **Declarative UI**: Simplifies complex UI state management
 - **TypeScript integration**: First-class support for type safety
@@ -34,6 +37,7 @@ Use **React 19** with TypeScript as the UI framework.
 - **Performance**: Virtual DOM provides efficient updates for dynamic content
 
 ### Negative
+
 - **Bundle size**: React adds ~45KB to the bundle (minified + gzipped)
 - **Learning curve**: Requires familiarity with hooks, JSX, and React patterns
 - **No built-in state management**: Relies on React's built-in state (useState/useReducer) which is sufficient for this app's complexity
@@ -48,4 +52,5 @@ Use **React 19** with TypeScript as the UI framework.
 
 4. **SolidJS**: Fine-grained reactivity, excellent performance. Rejected due to smaller ecosystem and community compared to React.
 
-5. **Preact**: React-compatible, smaller footprint. Rejected because the bundle size savings (~3KB) don't justify the potential compatibility issues with React libraries.
+5. **Preact**: React-compatible, smaller footprint. Rejected because the bundle size savings (~3KB) don't justify the potential compatibility issues with React
+   libraries.

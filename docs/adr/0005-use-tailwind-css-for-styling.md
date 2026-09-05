@@ -6,6 +6,7 @@
 ## Context
 
 Team Scrambler needs a styling solution that:
+
 - Provides consistent, maintainable CSS
 - Supports responsive design (mobile-first)
 - Allows for custom styling (scrambled-eggs-inspired color palette)
@@ -14,6 +15,7 @@ Team Scrambler needs a styling solution that:
 - Supports dark/light mode theming
 
 The project requires styling for:
+
 - Complex table layouts (PeopleTable)
 - Card grids (TeamCards)
 - Forms and inputs (ScramblerSettings, CsvDropZone)
@@ -27,6 +29,7 @@ Use **Tailwind CSS 4** with **daisyUI** component library for styling.
 ## Consequences
 
 ### Positive
+
 - **Utility-first**: Rapid development with pre-defined classes, no context switching between files
 - **Consistency**: Enforces design system through configuration (colors, spacing, typography)
 - **Responsive**: Built-in responsive prefixes make mobile-first design easy
@@ -38,6 +41,7 @@ Use **Tailwind CSS 4** with **daisyUI** component library for styling.
 - **Vite integration**: Official `@tailwindcss/vite` plugin available
 
 ### Negative
+
 - **Verbose markup**: HTML can become cluttered with many class names
 - **Learning curve**: Requires memorizing or frequently looking up class names
 - **Custom designs**: Complex custom designs may require custom CSS or `@apply`
@@ -56,4 +60,5 @@ Use **Tailwind CSS 4** with **daisyUI** component library for styling.
 
 5. **Bootstrap**: Pre-built component library. Rejected because it's heavier and more opinionated about design, making custom theming harder.
 
-6. **Chakra UI**: React component library. Rejected because Tailwind + daisyUI provides more flexibility for custom styling while still offering component shortcuts.
+6. **Chakra UI**: React component library. Rejected because Tailwind + daisyUI provides more flexibility for custom styling while still offering component
+   shortcuts.
